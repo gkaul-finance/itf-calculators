@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Cash Flow Estimation | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus { outline: none; border-color: var(--accent); }
+        .input-group small { color: #666; font-size: 0.8rem; }
+        
+        .waterfall {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .waterfall-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .waterfall-row:last-child { border-bottom: none; }
+        
+        .waterfall-row.total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: var(--primary);
+            color: white;
+            margin: 0.5rem -1.5rem -1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .waterfall-row.subtotal {
+            font-weight: 600;
+            background: #e3f2fd;
+            margin: 0 -1.5rem;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .waterfall-label { color: #333; }
+        .waterfall-value { font-family: monospace; font-size: 1.05rem; }
+        .waterfall-value.positive { color: var(--success); }
+        .waterfall-value.negative { color: var(--danger); }
+        
+        .result-highlight {
+            background: linear-gradient(135deg, var(--success) 0%, #2e7d32 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .result-highlight.negative {
+            background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+        }
+        
+        .result-label { font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-value { font-size: 2.5rem; font-weight: 700; }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        
+        .warning-box {
+            background: #ffebee;
+            border-left: 4px solid var(--danger);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-box h4 { color: var(--danger); margin-bottom: 0.5rem; }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 4</div>
+            <h1>Cash Flow Estimation Calculator</h1>
+            <p>Free Cash Flow Waterfall Builder</p>
+        </header>
+        
+        <div class="main-content">
+            <h3 class="section-title">📊 Revenue & Operating Costs</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Revenue ($)</label>
+                    <input type="number" id="revenue" value="500000" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label>Cost of Goods Sold ($)</label>
+                    <input type="number" id="cogs" value="200000" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label>Operating Expenses ($)</label>
+                    <input type="number" id="opex" value="100000" oninput="calculate()">
+                    <small>Excluding depreciation</small>
+                </div>
+            </div>
+            
+            <h3 class="section-title">🏭 Capital & Depreciation</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Depreciation Expense ($)</label>
+                    <input type="number" id="depreciation" value="50000" oninput="calculate()">
+                    <small>Non-cash expense</small>
+                </div>
+                <div class="input-group">
+                    <label>Capital Expenditure ($)</label>
+                    <input type="number" id="capex" value="75000" oninput="calculate()">
+                    <small>New equipment purchases</small>
+                </div>
+            </div>
+            
+            <h3 class="section-title">💰 Working Capital & Taxes</h3>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Change in Net Working Capital ($)</label>
+                    <input type="number" id="nwc" value="10000" oninput="calculate()">
+                    <small>Increase = cash outflow (positive)</small>
+                </div>
+                <div class="input-group">
+                    <label>Tax Rate (%)</label>
+                    <input type="number" id="tax-rate" value="25" step="0.1" oninput="calculate()">
+                </div>
+            </div>
+            
+            <!-- Waterfall -->
+            <div class="waterfall">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">Cash Flow Waterfall</h3>
+                
+                <div class="waterfall-row">
+                    <span class="waterfall-label">Revenue</span>
+                    <span class="waterfall-value positive" id="wf-revenue">$500,000</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Cost of Goods Sold</span>
+                    <span class="waterfall-value negative" id="wf-cogs">($200,000)</span>
+                </div>
+                <div class="waterfall-row subtotal">
+                    <span class="waterfall-label">= Gross Profit</span>
+                    <span class="waterfall-value" id="wf-gross">$300,000</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Operating Expenses</span>
+                    <span class="waterfall-value negative" id="wf-opex">($100,000)</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Depreciation</span>
+                    <span class="waterfall-value negative" id="wf-depr">($50,000)</span>
+                </div>
+                <div class="waterfall-row subtotal">
+                    <span class="waterfall-label">= EBIT (Operating Income)</span>
+                    <span class="waterfall-value" id="wf-ebit">$150,000</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Taxes (25%)</span>
+                    <span class="waterfall-value negative" id="wf-taxes">($37,500)</span>
+                </div>
+                <div class="waterfall-row subtotal">
+                    <span class="waterfall-label">= EBIT × (1 - Tax Rate)</span>
+                    <span class="waterfall-value" id="wf-nopat">$112,500</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">+ Add Back Depreciation</span>
+                    <span class="waterfall-value positive" id="wf-adddepr">$50,000</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Capital Expenditures</span>
+                    <span class="waterfall-value negative" id="wf-capex">($75,000)</span>
+                </div>
+                <div class="waterfall-row">
+                    <span class="waterfall-label">− Change in NWC</span>
+                    <span class="waterfall-value negative" id="wf-nwc">($10,000)</span>
+                </div>
+                <div class="waterfall-row total">
+                    <span class="waterfall-label">= Free Cash Flow</span>
+                    <span class="waterfall-value" id="wf-fcf">$77,500</span>
+                </div>
+            </div>
+            
+            <!-- Result -->
+            <div class="result-highlight" id="result-box">
+                <div class="result-label">Free Cash Flow</div>
+                <div class="result-value" id="fcf-result">$77,500</div>
+            </div>
+            
+            <!-- Depreciation Tax Shield -->
+            <div class="insight-box">
+                <h4>🛡️ Depreciation Tax Shield</h4>
+                <p id="tax-shield-insight">
+                    The depreciation tax shield saves you <strong>$12,500</strong> in taxes!<br>
+                    Calculation: $50,000 × 25% = $12,500<br>
+                    <em>Depreciation reduces taxable income, but since it's non-cash, you add it back later.</em>
+                </p>
+            </div>
+            
+            <div class="formula-box">
+                <strong>Free Cash Flow Formula:</strong><br><br>
+                <code>FCF = EBIT(1-T) + Depreciation − CapEx − ΔNWC</code><br><br>
+                Or equivalently:<br>
+                <code>FCF = Operating Cash Flow − CapEx − ΔNWC</code>
+            </div>
+            
+            <div class="warning-box">
+                <h4>⚠️ Common Mistakes to Avoid</h4>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li><strong>Sunk costs:</strong> Never include costs already incurred (they're irrelevant)</li>
+                    <li><strong>Opportunity costs:</strong> Always include forgone alternatives</li>
+                    <li><strong>Side effects:</strong> Include cannibalization and synergies</li>
+                    <li><strong>Financing costs:</strong> Don't include interest—it's in the discount rate</li>
+                    <li><strong>Incremental analysis:</strong> Only count cash flows that change because of the project</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function formatCurrency(value, showParens = false) {
+            if (showParens && value < 0) {
+                return '($' + Math.abs(value).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ')';
+            }
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        }
+        
+        function calculate() {
+            const revenue = parseFloat(document.getElementById('revenue').value) || 0;
+            const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+            const opex = parseFloat(document.getElementById('opex').value) || 0;
+            const depreciation = parseFloat(document.getElementById('depreciation').value) || 0;
+            const capex = parseFloat(document.getElementById('capex').value) || 0;
+            const nwc = parseFloat(document.getElementById('nwc').value) || 0;
+            const taxRate = parseFloat(document.getElementById('tax-rate').value) / 100 || 0;
+            
+            // Calculations
+            const grossProfit = revenue - cogs;
+            const ebit = grossProfit - opex - depreciation;
+            const taxes = ebit * taxRate;
+            const nopat = ebit * (1 - taxRate);
+            const fcf = nopat + depreciation - capex - nwc;
+            
+            // Tax shield
+            const taxShield = depreciation * taxRate;
+            
+            // Update waterfall
+            document.getElementById('wf-revenue').textContent = formatCurrency(revenue);
+            document.getElementById('wf-cogs').textContent = formatCurrency(-cogs, true);
+            document.getElementById('wf-gross').textContent = formatCurrency(grossProfit);
+            document.getElementById('wf-opex').textContent = formatCurrency(-opex, true);
+            document.getElementById('wf-depr').textContent = formatCurrency(-depreciation, true);
+            document.getElementById('wf-ebit').textContent = formatCurrency(ebit);
+            document.getElementById('wf-taxes').textContent = formatCurrency(-taxes, true);
+            document.getElementById('wf-nopat').textContent = formatCurrency(nopat);
+            document.getElementById('wf-adddepr').textContent = formatCurrency(depreciation);
+            document.getElementById('wf-capex').textContent = formatCurrency(-capex, true);
+            document.getElementById('wf-nwc').textContent = formatCurrency(-nwc, true);
+            document.getElementById('wf-fcf').textContent = formatCurrency(fcf);
+            
+            // Update result
+            document.getElementById('fcf-result').textContent = formatCurrency(fcf);
+            
+            const resultBox = document.getElementById('result-box');
+            resultBox.className = 'result-highlight' + (fcf < 0 ? ' negative' : '');
+            
+            // Update tax shield insight
+            document.getElementById('tax-shield-insight').innerHTML = `
+                The depreciation tax shield saves you <strong>${formatCurrency(taxShield)}</strong> in taxes!<br>
+                Calculation: ${formatCurrency(depreciation)} × ${(taxRate*100).toFixed(0)}% = ${formatCurrency(taxShield)}<br>
+                <em>Depreciation reduces taxable income, but since it's non-cash, you add it back later.</em>
+            `;
+        }
+        
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html>

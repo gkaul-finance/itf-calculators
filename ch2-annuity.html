@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Annuity Calculator | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover { background: var(--light); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .calculator-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calculator-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .input-group { margin-bottom: 1rem; }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .input-group small { color: #666; font-size: 0.85rem; }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #003366 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .result-label { font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-value { font-size: 2.5rem; font-weight: 700; }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .result-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .result-item-label { font-size: 0.85rem; opacity: 0.8; }
+        .result-item-value { font-size: 1.3rem; font-weight: 600; }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .formula-box code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        
+        .timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2rem 0;
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .timeline-point {
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-cash {
+            position: absolute;
+            top: -30px;
+            font-size: 0.8rem;
+            color: var(--success);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        footer a { color: var(--primary); }
+        
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.4rem; }
+            .result-value { font-size: 2rem; }
+            .tabs { flex-direction: column; }
+            .tab-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 2</div>
+            <h1>Annuity Calculator</h1>
+            <p>Present Value, Future Value & Payment Analysis</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('pv-annuity')">PV of Annuity</button>
+                <button class="tab-btn" onclick="showTab('fv-annuity')">FV of Annuity</button>
+                <button class="tab-btn" onclick="showTab('payment')">Solve for Payment</button>
+                <button class="tab-btn" onclick="showTab('growing')">Growing Annuity</button>
+            </div>
+            
+            <!-- PV of Annuity -->
+            <div id="pv-annuity" class="tab-content active">
+                <div class="calculator-section">
+                    <h3>Present Value of an Annuity</h3>
+                    <p>What is a series of equal payments worth today?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Payment Amount ($)</label>
+                            <input type="number" id="pva-pmt" value="1000" oninput="calculatePVA()">
+                            <small>Amount received each period</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Interest Rate (% per period)</label>
+                            <input type="number" id="pva-rate" value="10" step="0.1" oninput="calculatePVA()">
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Periods</label>
+                            <input type="number" id="pva-n" value="5" oninput="calculatePVA()">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Annuity Type</label>
+                        <select id="pva-type" onchange="calculatePVA()">
+                            <option value="ordinary">Ordinary Annuity (payments at end of period)</option>
+                            <option value="due">Annuity Due (payments at beginning of period)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Present Value</div>
+                    <div class="result-value" id="pva-result">$3,790.79</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Total Payments</div>
+                            <div class="result-item-value" id="pva-total">$5,000.00</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Interest Discount</div>
+                            <div class="result-item-value" id="pva-discount">$1,209.21</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Annuity Factor</div>
+                            <div class="result-item-value" id="pva-factor">3.7908</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula (Ordinary Annuity):</strong><br>
+                    <code>PV = PMT × [1 - (1+r)<sup>-n</sup>] / r</code>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="pva-insight">The annuity factor (3.7908) tells you that each $1 of annual payment is worth $3.79 today. This is the sum of individual discount factors for each period.</p>
+                </div>
+            </div>
+            
+            <!-- FV of Annuity -->
+            <div id="fv-annuity" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Future Value of an Annuity</h3>
+                    <p>How much will regular savings grow to?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Payment Amount ($)</label>
+                            <input type="number" id="fva-pmt" value="1000" oninput="calculateFVA()">
+                            <small>Amount saved each period</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Interest Rate (% per period)</label>
+                            <input type="number" id="fva-rate" value="10" step="0.1" oninput="calculateFVA()">
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Periods</label>
+                            <input type="number" id="fva-n" value="5" oninput="calculateFVA()">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Annuity Type</label>
+                        <select id="fva-type" onchange="calculateFVA()">
+                            <option value="ordinary">Ordinary Annuity (payments at end)</option>
+                            <option value="due">Annuity Due (payments at beginning)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Future Value</div>
+                    <div class="result-value" id="fva-result">$6,105.10</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Total Deposits</div>
+                            <div class="result-item-value" id="fva-deposits">$5,000.00</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Interest Earned</div>
+                            <div class="result-item-value" id="fva-interest">$1,105.10</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula (Ordinary Annuity):</strong><br>
+                    <code>FV = PMT × [(1+r)<sup>n</sup> - 1] / r</code>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="fva-insight">You deposit $5,000 total but end up with $6,105.10. The extra $1,105.10 is earned interest — the power of regular saving plus compounding!</p>
+                </div>
+            </div>
+            
+            <!-- Solve for Payment -->
+            <div id="payment" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Solve for Payment (Loan/Savings)</h3>
+                    <p>What payment is needed to reach a goal or pay off a loan?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Present Value (Loan Amount) ($)</label>
+                            <input type="number" id="pmt-pv" value="100000" oninput="calculatePMT()">
+                        </div>
+                        <div class="input-group">
+                            <label>Interest Rate (% per period)</label>
+                            <input type="number" id="pmt-rate" value="0.5" step="0.01" oninput="calculatePMT()">
+                            <small>For mortgages: annual rate ÷ 12</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Periods</label>
+                            <input type="number" id="pmt-n" value="360" oninput="calculatePMT()">
+                            <small>For mortgages: years × 12</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Required Payment</div>
+                    <div class="result-value" id="pmt-result">$599.55</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Total Payments</div>
+                            <div class="result-item-value" id="pmt-total">$215,838.19</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Total Interest</div>
+                            <div class="result-item-value" id="pmt-interest">$115,838.19</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>PMT = PV × r / [1 - (1+r)<sup>-n</sup>]</code>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Mortgage Example</h4>
+                    <p id="pmt-insight">A $100,000 mortgage at 6% APR (0.5% monthly) for 30 years (360 months) requires $599.55/month. You'll pay $215,838 total — more than double the loan amount!</p>
+                </div>
+            </div>
+            
+            <!-- Growing Annuity -->
+            <div id="growing" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Growing Annuity</h3>
+                    <p>Present value when payments grow at a constant rate</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>First Payment ($)</label>
+                            <input type="number" id="ga-pmt" value="50000" oninput="calculateGA()">
+                            <small>Payment at end of year 1</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Discount Rate (%)</label>
+                            <input type="number" id="ga-rate" value="10" step="0.1" oninput="calculateGA()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Growth Rate (%)</label>
+                            <input type="number" id="ga-growth" value="3" step="0.1" oninput="calculateGA()">
+                            <small>Annual payment increase</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Years</label>
+                            <input type="number" id="ga-n" value="20" oninput="calculateGA()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Present Value of Growing Annuity</div>
+                    <div class="result-value" id="ga-result">$573,496.06</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">First Payment</div>
+                            <div class="result-item-value" id="ga-first">$50,000</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Last Payment</div>
+                            <div class="result-item-value" id="ga-last">$87,675</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Total Payments</div>
+                            <div class="result-item-value" id="ga-total-pmts">$1,343,519</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>PV = C × [1 - ((1+g)/(1+r))<sup>n</sup>] / (r - g)</code>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Career Application</h4>
+                    <p id="ga-insight">This models a career with salary growth! If your salary is $50,000 with 3% annual raises, the present value of 20 years of earnings (at 10% discount) is $573,496.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        // PV of Annuity
+        function calculatePVA() {
+            const pmt = parseFloat(document.getElementById('pva-pmt').value) || 0;
+            const rate = parseFloat(document.getElementById('pva-rate').value) / 100 || 0;
+            const n = parseFloat(document.getElementById('pva-n').value) || 0;
+            const type = document.getElementById('pva-type').value;
+            
+            let factor = (1 - Math.pow(1 + rate, -n)) / rate;
+            let pv = pmt * factor;
+            
+            if (type === 'due') {
+                pv = pv * (1 + rate);
+                factor = factor * (1 + rate);
+            }
+            
+            const total = pmt * n;
+            const discount = total - pv;
+            
+            document.getElementById('pva-result').textContent = formatCurrency(pv);
+            document.getElementById('pva-total').textContent = formatCurrency(total);
+            document.getElementById('pva-discount').textContent = formatCurrency(discount);
+            document.getElementById('pva-factor').textContent = factor.toFixed(4);
+            
+            document.getElementById('pva-insight').textContent = 
+                `The annuity factor (${factor.toFixed(4)}) tells you that each $1 of ${type === 'due' ? 'beginning-of-period' : 'end-of-period'} payment is worth $${factor.toFixed(2)} today. ${n} payments of ${formatCurrency(pmt)} = ${formatCurrency(total)}, but discounted to today = ${formatCurrency(pv)}.`;
+        }
+        
+        // FV of Annuity
+        function calculateFVA() {
+            const pmt = parseFloat(document.getElementById('fva-pmt').value) || 0;
+            const rate = parseFloat(document.getElementById('fva-rate').value) / 100 || 0;
+            const n = parseFloat(document.getElementById('fva-n').value) || 0;
+            const type = document.getElementById('fva-type').value;
+            
+            let fv = pmt * ((Math.pow(1 + rate, n) - 1) / rate);
+            
+            if (type === 'due') {
+                fv = fv * (1 + rate);
+            }
+            
+            const deposits = pmt * n;
+            const interest = fv - deposits;
+            
+            document.getElementById('fva-result').textContent = formatCurrency(fv);
+            document.getElementById('fva-deposits').textContent = formatCurrency(deposits);
+            document.getElementById('fva-interest').textContent = formatCurrency(interest);
+            
+            document.getElementById('fva-insight').textContent = 
+                `You deposit ${formatCurrency(deposits)} total (${n} × ${formatCurrency(pmt)}) but end up with ${formatCurrency(fv)}. The extra ${formatCurrency(interest)} is earned interest — ${((interest/deposits)*100).toFixed(1)}% more than you put in!`;
+        }
+        
+        // Payment Calculator
+        function calculatePMT() {
+            const pv = parseFloat(document.getElementById('pmt-pv').value) || 0;
+            const rate = parseFloat(document.getElementById('pmt-rate').value) / 100 || 0;
+            const n = parseFloat(document.getElementById('pmt-n').value) || 0;
+            
+            const pmt = pv * (rate / (1 - Math.pow(1 + rate, -n)));
+            const total = pmt * n;
+            const interest = total - pv;
+            
+            document.getElementById('pmt-result').textContent = formatCurrency(pmt);
+            document.getElementById('pmt-total').textContent = formatCurrency(total);
+            document.getElementById('pmt-interest').textContent = formatCurrency(interest);
+            
+            document.getElementById('pmt-insight').textContent = 
+                `To pay off ${formatCurrency(pv)} at ${(rate*100).toFixed(2)}% per period over ${n} periods, you need ${formatCurrency(pmt)}/period. Total paid: ${formatCurrency(total)} — that's ${formatCurrency(interest)} in interest (${((interest/pv)*100).toFixed(0)}% of principal)!`;
+        }
+        
+        // Growing Annuity
+        function calculateGA() {
+            const pmt = parseFloat(document.getElementById('ga-pmt').value) || 0;
+            const rate = parseFloat(document.getElementById('ga-rate').value) / 100 || 0;
+            const growth = parseFloat(document.getElementById('ga-growth').value) / 100 || 0;
+            const n = parseFloat(document.getElementById('ga-n').value) || 0;
+            
+            let pv;
+            if (Math.abs(rate - growth) < 0.0001) {
+                pv = pmt * n / (1 + rate);
+            } else {
+                pv = pmt * (1 - Math.pow((1 + growth) / (1 + rate), n)) / (rate - growth);
+            }
+            
+            const lastPmt = pmt * Math.pow(1 + growth, n - 1);
+            
+            // Calculate total payments
+            let totalPmts = 0;
+            for (let i = 0; i < n; i++) {
+                totalPmts += pmt * Math.pow(1 + growth, i);
+            }
+            
+            document.getElementById('ga-result').textContent = formatCurrency(pv);
+            document.getElementById('ga-first').textContent = formatCurrency(pmt);
+            document.getElementById('ga-last').textContent = formatCurrency(lastPmt);
+            document.getElementById('ga-total-pmts').textContent = formatCurrency(totalPmts);
+            
+            document.getElementById('ga-insight').textContent = 
+                `With ${(growth*100).toFixed(1)}% annual growth, payments grow from ${formatCurrency(pmt)} to ${formatCurrency(lastPmt)} over ${n} years. The present value of all these growing payments (at ${(rate*100).toFixed(1)}% discount) is ${formatCurrency(pv)}.`;
+        }
+        
+        // Initialize
+        calculatePVA();
+        calculateFVA();
+        calculatePMT();
+        calculateGA();
+    </script>
+</body>
+</html>

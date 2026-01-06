@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Bond Calculator | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --light: #f8f9fa;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover { background: var(--light); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .calculator-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calculator-section h3 { color: var(--primary); margin-bottom: 1rem; }
+        
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus { outline: none; border-color: var(--accent); }
+        .input-group small { color: #666; font-size: 0.85rem; }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #003366 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .result-label { font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-value { font-size: 2.5rem; font-weight: 700; }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .result-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .result-item-label { font-size: 0.8rem; opacity: 0.8; }
+        .result-item-value { font-size: 1.2rem; font-weight: 600; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        .status-badge.premium { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.discount { background: #ffebee; color: #c62828; }
+        .status-badge.par { background: #fff3e0; color: #e65100; }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 5</div>
+            <h1>Bond Valuation Calculator</h1>
+            <p>Bond Pricing, Yield to Maturity & Interest Rate Sensitivity</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('price')">Bond Price</button>
+                <button class="tab-btn" onclick="showTab('ytm')">Yield to Maturity</button>
+                <button class="tab-btn" onclick="showTab('sensitivity')">Rate Sensitivity</button>
+            </div>
+            
+            <!-- Bond Price Calculator -->
+            <div id="price" class="tab-content active">
+                <div class="calculator-section">
+                    <h3>Calculate Bond Price</h3>
+                    <p>What should you pay for this bond?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Face Value ($)</label>
+                            <input type="number" id="price-face" value="1000" oninput="calculatePrice()">
+                        </div>
+                        <div class="input-group">
+                            <label>Coupon Rate (% annual)</label>
+                            <input type="number" id="price-coupon" value="5" step="0.125" oninput="calculatePrice()">
+                        </div>
+                        <div class="input-group">
+                            <label>Years to Maturity</label>
+                            <input type="number" id="price-years" value="10" oninput="calculatePrice()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Market Interest Rate / YTM (%)</label>
+                            <input type="number" id="price-ytm" value="6" step="0.1" oninput="calculatePrice()">
+                        </div>
+                        <div class="input-group">
+                            <label>Payments per Year</label>
+                            <select id="price-freq" onchange="calculatePrice()">
+                                <option value="1">Annual</option>
+                                <option value="2" selected>Semi-Annual</option>
+                                <option value="4">Quarterly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Bond Price</div>
+                    <div class="result-value" id="price-result">$925.61</div>
+                    <span class="status-badge discount" id="price-status">Trading at Discount</span>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">PV of Coupons</div>
+                            <div class="result-item-value" id="price-pv-coupons">$369.39</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">PV of Face Value</div>
+                            <div class="result-item-value" id="price-pv-face">$556.22</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Current Yield</div>
+                            <div class="result-item-value" id="price-current-yield">5.40%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Why Discount or Premium?</h4>
+                    <p id="price-insight">When market rates (6%) exceed the coupon rate (5%), the bond trades at a discount. Investors won't pay full price for below-market coupons.</p>
+                </div>
+            </div>
+            
+            <!-- YTM Calculator -->
+            <div id="ytm" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Calculate Yield to Maturity</h3>
+                    <p>What return will you earn if you buy at this price?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Current Price ($)</label>
+                            <input type="number" id="ytm-price" value="950" oninput="calculateYTM()">
+                        </div>
+                        <div class="input-group">
+                            <label>Face Value ($)</label>
+                            <input type="number" id="ytm-face" value="1000" oninput="calculateYTM()">
+                        </div>
+                        <div class="input-group">
+                            <label>Coupon Rate (% annual)</label>
+                            <input type="number" id="ytm-coupon" value="5" step="0.125" oninput="calculateYTM()">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Years to Maturity</label>
+                            <input type="number" id="ytm-years" value="10" oninput="calculateYTM()">
+                        </div>
+                        <div class="input-group">
+                            <label>Payments per Year</label>
+                            <select id="ytm-freq" onchange="calculateYTM()">
+                                <option value="1">Annual</option>
+                                <option value="2" selected>Semi-Annual</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Yield to Maturity (Annual)</div>
+                    <div class="result-value" id="ytm-result">5.66%</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Current Yield</div>
+                            <div class="result-item-value" id="ytm-current">5.26%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Capital Gain Yield</div>
+                            <div class="result-item-value" id="ytm-capgain">0.40%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Total Return</div>
+                            <div class="result-item-value" id="ytm-total">5.66%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>YTM Components:</strong><br>
+                    <code>YTM ≈ Current Yield + Capital Gain Yield</code><br><br>
+                    Current Yield = Annual Coupon / Price<br>
+                    Capital Gain Yield = (Face - Price) / Price / Years
+                </div>
+            </div>
+            
+            <!-- Sensitivity Analysis -->
+            <div id="sensitivity" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Interest Rate Sensitivity</h3>
+                    <p>How does price change when rates move?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Face Value ($)</label>
+                            <input type="number" id="sens-face" value="1000" oninput="calculateSensitivity()">
+                        </div>
+                        <div class="input-group">
+                            <label>Coupon Rate (%)</label>
+                            <input type="number" id="sens-coupon" value="5" step="0.125" oninput="calculateSensitivity()">
+                        </div>
+                        <div class="input-group">
+                            <label>Years to Maturity</label>
+                            <input type="number" id="sens-years" value="10" oninput="calculateSensitivity()">
+                        </div>
+                        <div class="input-group">
+                            <label>Current YTM (%)</label>
+                            <input type="number" id="sens-ytm" value="5" step="0.1" oninput="calculateSensitivity()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Price at Current YTM</div>
+                    <div class="result-value" id="sens-current-price">$1,000.00</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">If rates ↓ 1%</div>
+                            <div class="result-item-value" id="sens-down1" style="color: #4CAF50;">$1,077.95</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">If rates ↑ 1%</div>
+                            <div class="result-item-value" id="sens-up1" style="color: #f44336;">$928.94</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">If rates ↓ 2%</div>
+                            <div class="result-item-value" id="sens-down2" style="color: #4CAF50;">$1,164.50</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">If rates ↑ 2%</div>
+                            <div class="result-item-value" id="sens-up2" style="color: #f44336;">$863.73</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Relationship</h4>
+                    <p id="sens-insight"><strong>Prices and rates move inversely!</strong> When rates rise, bond prices fall — and vice versa. Longer-term bonds are MORE sensitive to rate changes.</p>
+                </div>
+            </div>
+            
+            <div class="formula-box">
+                <strong>Bond Price Formula:</strong><br>
+                <code>P = Σ [C / (1+y)^t] + [F / (1+y)^n]</code><br><br>
+                Where: C = coupon payment, y = yield per period, F = face value, n = periods
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+        
+        function bondPrice(face, couponRate, ytm, years, freq) {
+            const periodsPerYear = freq;
+            const n = years * periodsPerYear;
+            const couponPayment = (face * couponRate / 100) / periodsPerYear;
+            const periodRate = ytm / 100 / periodsPerYear;
+            
+            let pvCoupons = 0;
+            for (let t = 1; t <= n; t++) {
+                pvCoupons += couponPayment / Math.pow(1 + periodRate, t);
+            }
+            
+            const pvFace = face / Math.pow(1 + periodRate, n);
+            
+            return { price: pvCoupons + pvFace, pvCoupons, pvFace };
+        }
+        
+        function calculatePrice() {
+            const face = parseFloat(document.getElementById('price-face').value) || 1000;
+            const couponRate = parseFloat(document.getElementById('price-coupon').value) || 0;
+            const ytm = parseFloat(document.getElementById('price-ytm').value) || 0;
+            const years = parseFloat(document.getElementById('price-years').value) || 1;
+            const freq = parseInt(document.getElementById('price-freq').value) || 2;
+            
+            const result = bondPrice(face, couponRate, ytm, years, freq);
+            const annualCoupon = face * couponRate / 100;
+            const currentYield = (annualCoupon / result.price) * 100;
+            
+            document.getElementById('price-result').textContent = formatCurrency(result.price);
+            document.getElementById('price-pv-coupons').textContent = formatCurrency(result.pvCoupons);
+            document.getElementById('price-pv-face').textContent = formatCurrency(result.pvFace);
+            document.getElementById('price-current-yield').textContent = formatPercent(currentYield);
+            
+            const statusBadge = document.getElementById('price-status');
+            if (result.price > face * 1.001) {
+                statusBadge.textContent = 'Trading at Premium';
+                statusBadge.className = 'status-badge premium';
+            } else if (result.price < face * 0.999) {
+                statusBadge.textContent = 'Trading at Discount';
+                statusBadge.className = 'status-badge discount';
+            } else {
+                statusBadge.textContent = 'Trading at Par';
+                statusBadge.className = 'status-badge par';
+            }
+            
+            document.getElementById('price-insight').innerHTML = 
+                ytm > couponRate 
+                    ? `When market rates (${ytm}%) exceed the coupon rate (${couponRate}%), the bond trades at a <strong>discount</strong>. Investors won't pay full price for below-market coupons.`
+                    : ytm < couponRate
+                    ? `When the coupon rate (${couponRate}%) exceeds market rates (${ytm}%), the bond trades at a <strong>premium</strong>. Investors pay extra for above-market coupons.`
+                    : `When the coupon rate equals the market rate, the bond trades at <strong>par value</strong>.`;
+        }
+        
+        function calculateYTM() {
+            const price = parseFloat(document.getElementById('ytm-price').value) || 0;
+            const face = parseFloat(document.getElementById('ytm-face').value) || 1000;
+            const couponRate = parseFloat(document.getElementById('ytm-coupon').value) || 0;
+            const years = parseFloat(document.getElementById('ytm-years').value) || 1;
+            const freq = parseInt(document.getElementById('ytm-freq').value) || 2;
+            
+            // Newton-Raphson to find YTM
+            let ytm = couponRate / 100;
+            const annualCoupon = face * couponRate / 100;
+            
+            for (let i = 0; i < 100; i++) {
+                const result = bondPrice(face, couponRate, ytm * 100, years, freq);
+                const diff = result.price - price;
+                
+                if (Math.abs(diff) < 0.01) break;
+                
+                // Numerical derivative
+                const result2 = bondPrice(face, couponRate, (ytm + 0.0001) * 100, years, freq);
+                const deriv = (result2.price - result.price) / 0.0001;
+                
+                ytm = ytm - diff / deriv;
+            }
+            
+            const currentYield = (annualCoupon / price) * 100;
+            const capGainYield = ((face - price) / price / years) * 100;
+            
+            document.getElementById('ytm-result').textContent = formatPercent(ytm * 100);
+            document.getElementById('ytm-current').textContent = formatPercent(currentYield);
+            document.getElementById('ytm-capgain').textContent = formatPercent(capGainYield);
+            document.getElementById('ytm-total').textContent = formatPercent(ytm * 100);
+        }
+        
+        function calculateSensitivity() {
+            const face = parseFloat(document.getElementById('sens-face').value) || 1000;
+            const couponRate = parseFloat(document.getElementById('sens-coupon').value) || 0;
+            const ytm = parseFloat(document.getElementById('sens-ytm').value) || 0;
+            const years = parseFloat(document.getElementById('sens-years').value) || 1;
+            
+            const current = bondPrice(face, couponRate, ytm, years, 2).price;
+            const down1 = bondPrice(face, couponRate, ytm - 1, years, 2).price;
+            const up1 = bondPrice(face, couponRate, ytm + 1, years, 2).price;
+            const down2 = bondPrice(face, couponRate, ytm - 2, years, 2).price;
+            const up2 = bondPrice(face, couponRate, ytm + 2, years, 2).price;
+            
+            document.getElementById('sens-current-price').textContent = formatCurrency(current);
+            document.getElementById('sens-down1').textContent = formatCurrency(down1) + ` (+${((down1-current)/current*100).toFixed(1)}%)`;
+            document.getElementById('sens-up1').textContent = formatCurrency(up1) + ` (${((up1-current)/current*100).toFixed(1)}%)`;
+            document.getElementById('sens-down2').textContent = formatCurrency(down2) + ` (+${((down2-current)/current*100).toFixed(1)}%)`;
+            document.getElementById('sens-up2').textContent = formatCurrency(up2) + ` (${((up2-current)/current*100).toFixed(1)}%)`;
+            
+            document.getElementById('sens-insight').innerHTML = 
+                `<strong>Prices and rates move inversely!</strong> A 1% rate increase drops this bond's price by ${formatCurrency(current - up1)} (${((current-up1)/current*100).toFixed(1)}%). Longer-term bonds are MORE sensitive to rate changes.`;
+        }
+        
+        // Initialize
+        calculatePrice();
+        calculateYTM();
+        calculateSensitivity();
+    </script>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Time Value of Money Calculator | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            background: var(--light);
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .calculator-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calculator-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .input-group small {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #003366 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .result-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .formula-box code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 {
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+        
+        .calculation-steps {
+            background: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .calculation-steps h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .step {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--primary);
+        }
+        
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .result-value {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 1</div>
+            <h1>Time Value of Money Calculator</h1>
+            <p>Present Value, Future Value & Interest Rate Analysis</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('fv')">Future Value</button>
+                <button class="tab-btn" onclick="showTab('pv')">Present Value</button>
+                <button class="tab-btn" onclick="showTab('rate')">Solve for Rate</button>
+                <button class="tab-btn" onclick="showTab('periods')">Solve for Periods</button>
+            </div>
+            
+            <!-- Future Value Calculator -->
+            <div id="fv" class="tab-content active">
+                <div class="calculator-section">
+                    <h3>Calculate Future Value</h3>
+                    <p>How much will your investment grow to?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Present Value ($)</label>
+                            <input type="number" id="fv-pv" value="1000" oninput="calculateFV()">
+                            <small>Amount you have today</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Interest Rate (% per year)</label>
+                            <input type="number" id="fv-rate" value="10" step="0.1" oninput="calculateFV()">
+                            <small>Annual interest rate</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Years</label>
+                            <input type="number" id="fv-years" value="5" oninput="calculateFV()">
+                            <small>Investment period</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Future Value</div>
+                    <div class="result-value" id="fv-result">$1,610.51</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>FV = PV × (1 + r)<sup>n</sup></code>
+                </div>
+                
+                <div class="calculation-steps" id="fv-steps">
+                    <h4>Step-by-Step Calculation</h4>
+                    <div class="step">Step 1: Convert rate to decimal: 10% = 0.10</div>
+                    <div class="step">Step 2: Add 1 to rate: 1 + 0.10 = 1.10</div>
+                    <div class="step">Step 3: Raise to power n: 1.10^5 = 1.6105</div>
+                    <div class="step">Step 4: Multiply by PV: $1,000 × 1.6105 = $1,610.51</div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="fv-insight">Your money grows by $610.51 over 5 years. This is more than 5 × $100 = $500 of simple interest because you earn interest on your interest (compounding)!</p>
+                </div>
+            </div>
+            
+            <!-- Present Value Calculator -->
+            <div id="pv" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Calculate Present Value</h3>
+                    <p>What is a future amount worth today?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Future Value ($)</label>
+                            <input type="number" id="pv-fv" value="1000" oninput="calculatePV()">
+                            <small>Amount you'll receive in the future</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Discount Rate (% per year)</label>
+                            <input type="number" id="pv-rate" value="10" step="0.1" oninput="calculatePV()">
+                            <small>Your required return / opportunity cost</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Years</label>
+                            <input type="number" id="pv-years" value="5" oninput="calculatePV()">
+                            <small>Years until you receive the money</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Present Value</div>
+                    <div class="result-value" id="pv-result">$620.92</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>PV = FV / (1 + r)<sup>n</sup></code>
+                </div>
+                
+                <div class="calculation-steps" id="pv-steps">
+                    <h4>Step-by-Step Calculation</h4>
+                    <div class="step">Step 1: Convert rate to decimal: 10% = 0.10</div>
+                    <div class="step">Step 2: Calculate discount factor: (1.10)^5 = 1.6105</div>
+                    <div class="step">Step 3: Divide FV by factor: $1,000 / 1.6105 = $620.92</div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="pv-insight">$1,000 received in 5 years is worth only $620.92 today. Why? Because of your impatience (time preference) — you'd rather have money now than later!</p>
+                </div>
+            </div>
+            
+            <!-- Solve for Rate -->
+            <div id="rate" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Solve for Interest Rate</h3>
+                    <p>What return are you earning?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Present Value ($)</label>
+                            <input type="number" id="rate-pv" value="1000" oninput="calculateRate()">
+                            <small>Starting amount</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Future Value ($)</label>
+                            <input type="number" id="rate-fv" value="1610.51" oninput="calculateRate()">
+                            <small>Ending amount</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Number of Years</label>
+                            <input type="number" id="rate-years" value="5" oninput="calculateRate()">
+                            <small>Investment period</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Interest Rate (Annual)</div>
+                    <div class="result-value" id="rate-result">10.00%</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>r = (FV / PV)<sup>1/n</sup> - 1</code>
+                </div>
+                
+                <div class="calculation-steps" id="rate-steps">
+                    <h4>Step-by-Step Calculation</h4>
+                    <div class="step">Step 1: Divide FV by PV: $1,610.51 / $1,000 = 1.6105</div>
+                    <div class="step">Step 2: Take nth root: 1.6105^(1/5) = 1.10</div>
+                    <div class="step">Step 3: Subtract 1: 1.10 - 1 = 0.10 = 10%</div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="rate-insight">This is your compound annual growth rate (CAGR). It tells you the equivalent annual return, even if growth wasn't steady each year.</p>
+                </div>
+            </div>
+            
+            <!-- Solve for Periods -->
+            <div id="periods" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Solve for Number of Periods</h3>
+                    <p>How long until you reach your goal?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Present Value ($)</label>
+                            <input type="number" id="periods-pv" value="1000" oninput="calculatePeriods()">
+                            <small>Starting amount</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Future Value ($)</label>
+                            <input type="number" id="periods-fv" value="2000" oninput="calculatePeriods()">
+                            <small>Target amount</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Interest Rate (% per year)</label>
+                            <input type="number" id="periods-rate" value="10" step="0.1" oninput="calculatePeriods()">
+                            <small>Annual return</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Years to Goal</div>
+                    <div class="result-value" id="periods-result">7.27 years</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>n = ln(FV / PV) / ln(1 + r)</code>
+                </div>
+                
+                <div class="calculation-steps" id="periods-steps">
+                    <h4>Step-by-Step Calculation</h4>
+                    <div class="step">Step 1: Divide FV by PV: $2,000 / $1,000 = 2.0</div>
+                    <div class="step">Step 2: Take natural log: ln(2.0) = 0.6931</div>
+                    <div class="step">Step 3: Divide by ln(1+r): 0.6931 / ln(1.10) = 7.27</div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Rule of 72</h4>
+                    <p id="periods-insight">Quick estimate: 72 ÷ interest rate ≈ years to double. At 10%, that's 72 ÷ 10 = 7.2 years. The exact answer (7.27 years) is very close!</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+        
+        // Future Value Calculator
+        function calculateFV() {
+            const pv = parseFloat(document.getElementById('fv-pv').value) || 0;
+            const rate = parseFloat(document.getElementById('fv-rate').value) / 100 || 0;
+            const years = parseFloat(document.getElementById('fv-years').value) || 0;
+            
+            const fv = pv * Math.pow(1 + rate, years);
+            const interest = fv - pv;
+            const simpleInterest = pv * rate * years;
+            const compoundBenefit = interest - simpleInterest;
+            
+            document.getElementById('fv-result').textContent = formatCurrency(fv);
+            
+            // Update steps
+            document.getElementById('fv-steps').innerHTML = `
+                <h4>Step-by-Step Calculation</h4>
+                <div class="step">Step 1: Convert rate to decimal: ${(rate*100).toFixed(1)}% = ${rate.toFixed(4)}</div>
+                <div class="step">Step 2: Add 1 to rate: 1 + ${rate.toFixed(4)} = ${(1+rate).toFixed(4)}</div>
+                <div class="step">Step 3: Raise to power n: ${(1+rate).toFixed(4)}^${years} = ${Math.pow(1+rate, years).toFixed(4)}</div>
+                <div class="step">Step 4: Multiply by PV: ${formatCurrency(pv)} × ${Math.pow(1+rate, years).toFixed(4)} = ${formatCurrency(fv)}</div>
+            `;
+            
+            // Update insight
+            document.getElementById('fv-insight').textContent = 
+                `Your money grows by ${formatCurrency(interest)} over ${years} years. ` +
+                `Simple interest would be ${formatCurrency(simpleInterest)}, but compounding adds an extra ${formatCurrency(compoundBenefit)}!`;
+        }
+        
+        // Present Value Calculator
+        function calculatePV() {
+            const fv = parseFloat(document.getElementById('pv-fv').value) || 0;
+            const rate = parseFloat(document.getElementById('pv-rate').value) / 100 || 0;
+            const years = parseFloat(document.getElementById('pv-years').value) || 0;
+            
+            const pv = fv / Math.pow(1 + rate, years);
+            const discount = fv - pv;
+            
+            document.getElementById('pv-result').textContent = formatCurrency(pv);
+            
+            document.getElementById('pv-steps').innerHTML = `
+                <h4>Step-by-Step Calculation</h4>
+                <div class="step">Step 1: Convert rate to decimal: ${(rate*100).toFixed(1)}% = ${rate.toFixed(4)}</div>
+                <div class="step">Step 2: Calculate discount factor: (${(1+rate).toFixed(4)})^${years} = ${Math.pow(1+rate, years).toFixed(4)}</div>
+                <div class="step">Step 3: Divide FV by factor: ${formatCurrency(fv)} / ${Math.pow(1+rate, years).toFixed(4)} = ${formatCurrency(pv)}</div>
+            `;
+            
+            document.getElementById('pv-insight').textContent = 
+                `${formatCurrency(fv)} received in ${years} years is worth only ${formatCurrency(pv)} today — a discount of ${formatCurrency(discount)}. ` +
+                `This reflects your time preference: money today is worth more than money tomorrow!`;
+        }
+        
+        // Rate Calculator
+        function calculateRate() {
+            const pv = parseFloat(document.getElementById('rate-pv').value) || 0;
+            const fv = parseFloat(document.getElementById('rate-fv').value) || 0;
+            const years = parseFloat(document.getElementById('rate-years').value) || 1;
+            
+            const rate = Math.pow(fv / pv, 1 / years) - 1;
+            
+            document.getElementById('rate-result').textContent = formatPercent(rate * 100);
+            
+            document.getElementById('rate-steps').innerHTML = `
+                <h4>Step-by-Step Calculation</h4>
+                <div class="step">Step 1: Divide FV by PV: ${formatCurrency(fv)} / ${formatCurrency(pv)} = ${(fv/pv).toFixed(4)}</div>
+                <div class="step">Step 2: Take nth root: ${(fv/pv).toFixed(4)}^(1/${years}) = ${Math.pow(fv/pv, 1/years).toFixed(4)}</div>
+                <div class="step">Step 3: Subtract 1: ${Math.pow(fv/pv, 1/years).toFixed(4)} - 1 = ${rate.toFixed(4)} = ${formatPercent(rate*100)}</div>
+            `;
+            
+            document.getElementById('rate-insight').textContent = 
+                `Your compound annual growth rate (CAGR) is ${formatPercent(rate*100)}. ` +
+                `This means your investment grew at an equivalent rate of ${formatPercent(rate*100)} each year.`;
+        }
+        
+        // Periods Calculator
+        function calculatePeriods() {
+            const pv = parseFloat(document.getElementById('periods-pv').value) || 0;
+            const fv = parseFloat(document.getElementById('periods-fv').value) || 0;
+            const rate = parseFloat(document.getElementById('periods-rate').value) / 100 || 0;
+            
+            const periods = Math.log(fv / pv) / Math.log(1 + rate);
+            const rule72 = 72 / (rate * 100);
+            
+            document.getElementById('periods-result').textContent = periods.toFixed(2) + ' years';
+            
+            document.getElementById('periods-steps').innerHTML = `
+                <h4>Step-by-Step Calculation</h4>
+                <div class="step">Step 1: Divide FV by PV: ${formatCurrency(fv)} / ${formatCurrency(pv)} = ${(fv/pv).toFixed(4)}</div>
+                <div class="step">Step 2: Take natural log: ln(${(fv/pv).toFixed(4)}) = ${Math.log(fv/pv).toFixed(4)}</div>
+                <div class="step">Step 3: Divide by ln(1+r): ${Math.log(fv/pv).toFixed(4)} / ln(${(1+rate).toFixed(4)}) = ${periods.toFixed(2)}</div>
+            `;
+            
+            const multiple = fv / pv;
+            if (Math.abs(multiple - 2) < 0.1) {
+                document.getElementById('periods-insight').textContent = 
+                    `Rule of 72 check: 72 ÷ ${(rate*100).toFixed(0)} = ${rule72.toFixed(1)} years to double. Your exact answer of ${periods.toFixed(2)} years is very close!`;
+            } else {
+                document.getElementById('periods-insight').textContent = 
+                    `At ${formatPercent(rate*100)} annual return, it takes ${periods.toFixed(2)} years to grow from ${formatCurrency(pv)} to ${formatCurrency(fv)} (${multiple.toFixed(2)}x growth).`;
+            }
+        }
+        
+        // Initialize all calculators
+        calculateFV();
+        calculatePV();
+        calculateRate();
+        calculatePeriods();
+    </script>
+</body>
+</html>

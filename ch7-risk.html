@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Risk Calculator | Introduction to Finance</title>
+    <style>
+        :root { --primary: #00274C; --secondary: #FFCB05; --accent: #2196F3; --success: #4CAF50; --warning: #FF9800; --danger: #f44336; --light: #f8f9fa; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; line-height: 1.6; }
+        .container { max-width: 950px; margin: 0 auto; }
+        header { background: var(--primary); color: white; padding: 2rem; border-radius: 12px 12px 0 0; text-align: center; }
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .chapter-badge { background: var(--secondary); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 1rem; }
+        .main-content { background: white; padding: 2rem; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 20px; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 8px; cursor: pointer; font-size: 0.95rem; font-weight: 500; }
+        .tab-btn:hover { background: var(--light); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .calculator-section { background: var(--light); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .calculator-section h3 { color: var(--primary); margin-bottom: 1rem; }
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .input-group input, .input-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        .input-group input:focus, .input-group textarea:focus { outline: none; border-color: var(--accent); }
+        .input-group small { color: #666; font-size: 0.85rem; }
+        .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+        .result-box { background: linear-gradient(135deg, var(--primary) 0%, #003366 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center; margin: 1.5rem 0; }
+        .result-label { font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-value { font-size: 2.2rem; font-weight: 700; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .result-item { background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; }
+        .result-item-label { font-size: 0.8rem; opacity: 0.8; }
+        .result-item-value { font-size: 1.1rem; font-weight: 600; }
+        .formula-box { background: #e3f2fd; border-left: 4px solid var(--accent); padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .insight-box { background: #fff3e0; border-left: 4px solid var(--warning); padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        .data-table th, .data-table td { padding: 8px 12px; border: 1px solid #ddd; text-align: center; }
+        .data-table th { background: var(--primary); color: white; }
+        .data-table tr:nth-child(even) { background: #f9f9f9; }
+        footer { text-align: center; padding: 2rem; color: #666; }
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 7</div>
+            <h1>Risk & Return Calculator</h1>
+            <p>Expected Return, Standard Deviation & Portfolio Basics</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('expected')">Expected Return</button>
+                <button class="tab-btn" onclick="showTab('stddev')">Standard Deviation</button>
+                <button class="tab-btn" onclick="showTab('portfolio')">Two-Asset Portfolio</button>
+            </div>
+            
+            <!-- Expected Return -->
+            <div id="expected" class="tab-content active">
+                <div class="calculator-section">
+                    <h3>Expected Return from Scenarios</h3>
+                    <p>Calculate expected return using probability-weighted outcomes</p>
+                    
+                    <div class="input-group">
+                        <label>Enter Scenarios (Probability, Return)</label>
+                        <textarea id="exp-scenarios" rows="5" oninput="calculateExpected()" placeholder="Enter each scenario on a new line: probability, return
+Example:
+0.25, 30
+0.50, 10
+0.25, -10">0.25, 30
+0.50, 10
+0.25, -10</textarea>
+                        <small>Format: probability (decimal), return (%). One scenario per line.</small>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Expected Return E(R)</div>
+                    <div class="result-value" id="exp-result">10.00%</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Variance</div>
+                            <div class="result-item-value" id="exp-variance">200.00</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Std Deviation</div>
+                            <div class="result-item-value" id="exp-std">14.14%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">CV (Risk/Return)</div>
+                            <div class="result-item-value" id="exp-cv">1.41</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="data-table" id="exp-table">
+                    <thead>
+                        <tr><th>Scenario</th><th>Probability</th><th>Return</th><th>Prob × Return</th><th>Deviation²</th><th>Prob × Dev²</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                
+                <div class="formula-box">
+                    <strong>Formulas:</strong><br>
+                    <code>E(R) = Σ [pᵢ × Rᵢ]</code><br>
+                    <code>Variance = Σ [pᵢ × (Rᵢ - E(R))²]</code><br>
+                    <code>Std Dev = √Variance</code>
+                </div>
+            </div>
+            
+            <!-- Standard Deviation from Historical Data -->
+            <div id="stddev" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Historical Return Statistics</h3>
+                    <p>Calculate mean and standard deviation from historical returns</p>
+                    
+                    <div class="input-group">
+                        <label>Enter Historical Returns (%)</label>
+                        <textarea id="hist-returns" rows="4" oninput="calculateHistorical()" placeholder="Enter returns separated by commas or new lines">15, 8, -5, 22, 10, -3, 18, 12</textarea>
+                        <small>Enter annual returns as percentages</small>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Average (Mean) Return</div>
+                    <div class="result-value" id="hist-mean">9.63%</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Sample Std Dev</div>
+                            <div class="result-item-value" id="hist-std">9.52%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Observations</div>
+                            <div class="result-item-value" id="hist-n">8</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Range</div>
+                            <div class="result-item-value" id="hist-range">27.00%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Interpreting Standard Deviation</h4>
+                    <p id="hist-insight">With a 9.63% average return and 9.52% standard deviation, about 68% of returns fall between 0.11% and 19.15% (mean ± 1 std dev).</p>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Sample Standard Deviation:</strong><br>
+                    <code>s = √[Σ(Rᵢ - R̄)² / (n-1)]</code><br>
+                    <small>We divide by (n-1) for sample data to get an unbiased estimate</small>
+                </div>
+            </div>
+            
+            <!-- Two-Asset Portfolio -->
+            <div id="portfolio" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Two-Asset Portfolio</h3>
+                    <p>See how diversification affects portfolio risk</p>
+                    
+                    <h4 style="margin: 1rem 0 0.5rem; color: var(--primary);">Asset A</h4>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Expected Return (%)</label>
+                            <input type="number" id="port-ra" value="12" step="0.1" oninput="calculatePortfolio()">
+                        </div>
+                        <div class="input-group">
+                            <label>Standard Deviation (%)</label>
+                            <input type="number" id="port-sda" value="20" step="0.1" oninput="calculatePortfolio()">
+                        </div>
+                        <div class="input-group">
+                            <label>Weight (%)</label>
+                            <input type="number" id="port-wa" value="60" step="5" oninput="calculatePortfolio()">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 1rem 0 0.5rem; color: var(--primary);">Asset B</h4>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Expected Return (%)</label>
+                            <input type="number" id="port-rb" value="8" step="0.1" oninput="calculatePortfolio()">
+                        </div>
+                        <div class="input-group">
+                            <label>Standard Deviation (%)</label>
+                            <input type="number" id="port-sdb" value="15" step="0.1" oninput="calculatePortfolio()">
+                        </div>
+                        <div class="input-group">
+                            <label>Weight (%)</label>
+                            <input type="number" id="port-wb" value="40" readonly style="background: #eee;">
+                        </div>
+                    </div>
+                    
+                    <div class="input-row" style="margin-top: 1rem;">
+                        <div class="input-group">
+                            <label>Correlation (ρ)</label>
+                            <input type="number" id="port-corr" value="0.3" min="-1" max="1" step="0.1" oninput="calculatePortfolio()">
+                            <small>Range: -1 to +1</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Portfolio Expected Return</div>
+                    <div class="result-value" id="port-return">10.40%</div>
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Portfolio Std Dev</div>
+                            <div class="result-item-value" id="port-std">14.87%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Weighted Avg Std</div>
+                            <div class="result-item-value" id="port-wavg">18.00%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Risk Reduction</div>
+                            <div class="result-item-value" id="port-benefit">3.13%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Diversification Benefit</h4>
+                    <p id="port-insight">The portfolio's risk (14.87%) is LESS than the weighted average of individual risks (18.00%). This 3.13% reduction is the diversification benefit — you get it for free when assets aren't perfectly correlated!</p>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Portfolio Formulas:</strong><br>
+                    <code>E(Rₚ) = wₐE(Rₐ) + wᵦE(Rᵦ)</code><br>
+                    <code>σₚ² = wₐ²σₐ² + wᵦ²σᵦ² + 2wₐwᵦρσₐσᵦ</code>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function formatPercent(value) { return value.toFixed(2) + '%'; }
+        
+        function parseScenarios(text) {
+            const lines = text.trim().split('\n');
+            return lines.map(line => {
+                const parts = line.split(',').map(p => parseFloat(p.trim()));
+                return { prob: parts[0] || 0, ret: parts[1] || 0 };
+            }).filter(s => !isNaN(s.prob) && !isNaN(s.ret));
+        }
+        
+        function calculateExpected() {
+            const scenarios = parseScenarios(document.getElementById('exp-scenarios').value);
+            if (scenarios.length === 0) return;
+            
+            const expReturn = scenarios.reduce((sum, s) => sum + s.prob * s.ret, 0);
+            const variance = scenarios.reduce((sum, s) => sum + s.prob * Math.pow(s.ret - expReturn, 2), 0);
+            const stdDev = Math.sqrt(variance);
+            const cv = stdDev / Math.abs(expReturn);
+            
+            document.getElementById('exp-result').textContent = formatPercent(expReturn);
+            document.getElementById('exp-variance').textContent = variance.toFixed(2);
+            document.getElementById('exp-std').textContent = formatPercent(stdDev);
+            document.getElementById('exp-cv').textContent = cv.toFixed(2);
+            
+            // Update table
+            const tbody = document.querySelector('#exp-table tbody');
+            tbody.innerHTML = scenarios.map((s, i) => {
+                const contrib = s.prob * s.ret;
+                const devSq = Math.pow(s.ret - expReturn, 2);
+                const varContrib = s.prob * devSq;
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td>${(s.prob * 100).toFixed(0)}%</td>
+                    <td>${s.ret.toFixed(1)}%</td>
+                    <td>${contrib.toFixed(2)}</td>
+                    <td>${devSq.toFixed(2)}</td>
+                    <td>${varContrib.toFixed(2)}</td>
+                </tr>`;
+            }).join('') + `<tr style="font-weight:bold;background:#e3f2fd;">
+                <td colspan="3">Totals</td>
+                <td>${expReturn.toFixed(2)}</td>
+                <td>—</td>
+                <td>${variance.toFixed(2)}</td>
+            </tr>`;
+        }
+        
+        function calculateHistorical() {
+            const text = document.getElementById('hist-returns').value;
+            const returns = text.split(/[,\n]/).map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+            if (returns.length < 2) return;
+            
+            const n = returns.length;
+            const mean = returns.reduce((a, b) => a + b, 0) / n;
+            const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / (n - 1);
+            const stdDev = Math.sqrt(variance);
+            const range = Math.max(...returns) - Math.min(...returns);
+            
+            document.getElementById('hist-mean').textContent = formatPercent(mean);
+            document.getElementById('hist-std').textContent = formatPercent(stdDev);
+            document.getElementById('hist-n').textContent = n;
+            document.getElementById('hist-range').textContent = formatPercent(range);
+            
+            const low = mean - stdDev;
+            const high = mean + stdDev;
+            document.getElementById('hist-insight').textContent = 
+                `With a ${formatPercent(mean)} average return and ${formatPercent(stdDev)} standard deviation, about 68% of returns fall between ${formatPercent(low)} and ${formatPercent(high)} (mean ± 1 std dev).`;
+        }
+        
+        function calculatePortfolio() {
+            const ra = parseFloat(document.getElementById('port-ra').value) || 0;
+            const rb = parseFloat(document.getElementById('port-rb').value) || 0;
+            const sda = parseFloat(document.getElementById('port-sda').value) || 0;
+            const sdb = parseFloat(document.getElementById('port-sdb').value) || 0;
+            const wa = parseFloat(document.getElementById('port-wa').value) / 100 || 0;
+            const wb = 1 - wa;
+            const corr = parseFloat(document.getElementById('port-corr').value) || 0;
+            
+            document.getElementById('port-wb').value = (wb * 100).toFixed(0);
+            
+            const portReturn = wa * ra + wb * rb;
+            const portVar = Math.pow(wa * sda, 2) + Math.pow(wb * sdb, 2) + 2 * wa * wb * corr * sda * sdb;
+            const portStd = Math.sqrt(portVar);
+            const weightedAvgStd = wa * sda + wb * sdb;
+            const benefit = weightedAvgStd - portStd;
+            
+            document.getElementById('port-return').textContent = formatPercent(portReturn);
+            document.getElementById('port-std').textContent = formatPercent(portStd);
+            document.getElementById('port-wavg').textContent = formatPercent(weightedAvgStd);
+            document.getElementById('port-benefit').textContent = formatPercent(benefit);
+            
+            document.getElementById('port-insight').textContent = 
+                `The portfolio's risk (${formatPercent(portStd)}) is ${portStd < weightedAvgStd ? 'LESS' : 'equal to or more'} than the weighted average of individual risks (${formatPercent(weightedAvgStd)}). This ${formatPercent(benefit)} reduction is the diversification benefit — ${corr < 1 ? "you get it for free when assets aren't perfectly correlated!" : "with perfect correlation, there's no diversification benefit."}`;
+        }
+        
+        // Initialize
+        calculateExpected();
+        calculateHistorical();
+        calculatePortfolio();
+    </script>
+</body>
+</html>

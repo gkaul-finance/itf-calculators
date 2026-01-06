@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Perpetuity Calculator | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --light: #f8f9fa;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover { background: var(--light); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .calculator-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calculator-section h3 { color: var(--primary); margin-bottom: 1rem; }
+        
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus { outline: none; border-color: var(--accent); }
+        .input-group small { color: #666; font-size: 0.85rem; }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #003366 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .result-label { font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-value { font-size: 2.5rem; font-weight: 700; }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .formula-box code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        
+        .example-box {
+            background: #e8f5e9;
+            border-left: 4px solid var(--success);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .example-box h4 { color: var(--success); margin-bottom: 0.5rem; }
+        
+        .infinity-visual {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .infinity-visual .arrow {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 2</div>
+            <h1>Perpetuity Calculator</h1>
+            <p>Constant and Growing Perpetuities</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('basic')">Basic Perpetuity</button>
+                <button class="tab-btn" onclick="showTab('growing')">Growing Perpetuity</button>
+                <button class="tab-btn" onclick="showTab('reverse')">Reverse Engineering</button>
+            </div>
+            
+            <!-- Basic Perpetuity -->
+            <div id="basic" class="tab-content active">
+                <div class="calculator-section">
+                    <h3>Present Value of a Perpetuity</h3>
+                    <p>What is a stream of constant, never-ending payments worth today?</p>
+                    
+                    <div class="infinity-visual">
+                        <span>$C</span> → <span>$C</span> → <span>$C</span> → <span>$C</span> → 
+                        <span class="arrow">∞</span>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Cash Flow per Period ($)</label>
+                            <input type="number" id="basic-cf" value="100" oninput="calculateBasic()">
+                            <small>Payment received each period, forever</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Discount Rate (%)</label>
+                            <input type="number" id="basic-rate" value="10" step="0.1" oninput="calculateBasic()">
+                            <small>Your required return</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Present Value of Perpetuity</div>
+                    <div class="result-value" id="basic-result">$1,000.00</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>PV = C / r</code><br><br>
+                    <small>Where C = cash flow per period, r = discount rate (as decimal)</small>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Why Does This Work?</h4>
+                    <p id="basic-insight">If you have $1,000 earning 10% forever, you can withdraw $100 each year without ever touching the principal. The $1,000 generates $100 annually in perpetuity!</p>
+                </div>
+                
+                <div class="example-box">
+                    <h4>📚 Real-World Example: Endowments</h4>
+                    <p>Universities use perpetuities for endowed chairs. To fund a $100,000/year professorship at 5% return, you need: $100,000 / 0.05 = $2,000,000 endowment.</p>
+                </div>
+            </div>
+            
+            <!-- Growing Perpetuity -->
+            <div id="growing" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Present Value of a Growing Perpetuity</h3>
+                    <p>What is a stream of growing, never-ending payments worth today?</p>
+                    
+                    <div class="infinity-visual">
+                        <span>$C</span> → <span>$C(1+g)</span> → <span>$C(1+g)²</span> → 
+                        <span class="arrow">∞</span>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>First Cash Flow ($)</label>
+                            <input type="number" id="growing-cf" value="100" oninput="calculateGrowing()">
+                            <small>Payment at end of first period</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Discount Rate (%)</label>
+                            <input type="number" id="growing-rate" value="10" step="0.1" oninput="calculateGrowing()">
+                        </div>
+                        <div class="input-group">
+                            <label>Growth Rate (%)</label>
+                            <input type="number" id="growing-g" value="3" step="0.1" oninput="calculateGrowing()">
+                            <small>Must be less than discount rate</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Present Value of Growing Perpetuity</div>
+                    <div class="result-value" id="growing-result">$1,428.57</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Formula:</strong><br>
+                    <code>PV = C / (r - g)</code><br><br>
+                    <small>Where C = first cash flow, r = discount rate, g = growth rate</small>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Key Insight</h4>
+                    <p id="growing-insight">Growth increases value! A $100 payment growing at 3% forever is worth $1,428.57 — that's $428.57 more than without growth. The spread (r - g) matters: smaller spread = higher value.</p>
+                </div>
+                
+                <div class="example-box">
+                    <h4>📚 Stock Valuation (Gordon Growth Model)</h4>
+                    <p>This is exactly how we value stocks! If a stock pays $2/share dividend, growing 5%/year, with 12% required return: $2 / (0.12 - 0.05) = $28.57/share.</p>
+                </div>
+            </div>
+            
+            <!-- Reverse Engineering -->
+            <div id="reverse" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Reverse Engineering: What's Implied?</h3>
+                    <p>Given a price, what rate or growth is the market assuming?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Current Price/Value ($)</label>
+                            <input type="number" id="rev-price" value="1000" oninput="calculateReverse()">
+                        </div>
+                        <div class="input-group">
+                            <label>Cash Flow ($)</label>
+                            <input type="number" id="rev-cf" value="100" oninput="calculateReverse()">
+                        </div>
+                        <div class="input-group">
+                            <label>Growth Rate (%, enter 0 for basic)</label>
+                            <input type="number" id="rev-g" value="0" step="0.1" oninput="calculateReverse()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Implied Discount Rate</div>
+                    <div class="result-value" id="rev-rate-result">10.00%</div>
+                </div>
+                
+                <div class="formula-box">
+                    <strong>Rearranged Formula:</strong><br>
+                    <code>r = (C / PV) + g</code>
+                </div>
+                
+                <div class="insight-box">
+                    <h4>💡 Application: Stock Analysis</h4>
+                    <p id="rev-insight">If a stock trades at $50 with $2 dividend and 4% expected growth, the market's implied required return is: ($2/$50) + 4% = 4% + 4% = 8%. Is that return adequate for the risk?</p>
+                </div>
+                
+                <div class="calculator-section" style="margin-top: 2rem;">
+                    <h3>Implied Growth Rate</h3>
+                    <p>Given price and required return, what growth is implied?</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Current Price ($)</label>
+                            <input type="number" id="rev2-price" value="1000" oninput="calculateReverseG()">
+                        </div>
+                        <div class="input-group">
+                            <label>Cash Flow ($)</label>
+                            <input type="number" id="rev2-cf" value="50" oninput="calculateReverseG()">
+                        </div>
+                        <div class="input-group">
+                            <label>Required Return (%)</label>
+                            <input type="number" id="rev2-r" value="10" step="0.1" oninput="calculateReverseG()">
+                        </div>
+                    </div>
+                    
+                    <div class="result-box" style="margin-top: 1rem;">
+                        <div class="result-label">Implied Growth Rate</div>
+                        <div class="result-value" id="rev-g-result">5.00%</div>
+                    </div>
+                    
+                    <div class="formula-box">
+                        <strong>Rearranged Formula:</strong><br>
+                        <code>g = r - (C / PV)</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+        
+        function calculateBasic() {
+            const cf = parseFloat(document.getElementById('basic-cf').value) || 0;
+            const rate = parseFloat(document.getElementById('basic-rate').value) / 100 || 0.01;
+            
+            const pv = cf / rate;
+            
+            document.getElementById('basic-result').textContent = formatCurrency(pv);
+            document.getElementById('basic-insight').textContent = 
+                `If you have ${formatCurrency(pv)} earning ${formatPercent(rate*100)} forever, you can withdraw ${formatCurrency(cf)} each period without ever touching the principal. The ${formatCurrency(pv)} generates ${formatCurrency(cf)} annually in perpetuity!`;
+        }
+        
+        function calculateGrowing() {
+            const cf = parseFloat(document.getElementById('growing-cf').value) || 0;
+            const rate = parseFloat(document.getElementById('growing-rate').value) / 100 || 0.01;
+            const g = parseFloat(document.getElementById('growing-g').value) / 100 || 0;
+            
+            if (rate <= g) {
+                document.getElementById('growing-result').textContent = 'r must be > g';
+                return;
+            }
+            
+            const pv = cf / (rate - g);
+            const pvBasic = cf / rate;
+            const growthValue = pv - pvBasic;
+            
+            document.getElementById('growing-result').textContent = formatCurrency(pv);
+            document.getElementById('growing-insight').textContent = 
+                `Growth increases value! A ${formatCurrency(cf)} payment growing at ${formatPercent(g*100)} forever is worth ${formatCurrency(pv)} — that's ${formatCurrency(growthValue)} more than ${formatCurrency(pvBasic)} without growth. The spread (${formatPercent(rate*100)} - ${formatPercent(g*100)} = ${formatPercent((rate-g)*100)}) determines value.`;
+        }
+        
+        function calculateReverse() {
+            const price = parseFloat(document.getElementById('rev-price').value) || 1;
+            const cf = parseFloat(document.getElementById('rev-cf').value) || 0;
+            const g = parseFloat(document.getElementById('rev-g').value) / 100 || 0;
+            
+            const impliedRate = (cf / price) + g;
+            
+            document.getElementById('rev-rate-result').textContent = formatPercent(impliedRate * 100);
+            
+            const yieldPart = (cf / price) * 100;
+            document.getElementById('rev-insight').textContent = 
+                `If an asset trades at ${formatCurrency(price)} with ${formatCurrency(cf)} cash flow and ${formatPercent(g*100)} growth, the market's implied required return is: (${formatCurrency(cf)}/${formatCurrency(price)}) + ${formatPercent(g*100)} = ${formatPercent(yieldPart)} + ${formatPercent(g*100)} = ${formatPercent(impliedRate*100)}. Is that return adequate for the risk?`;
+        }
+        
+        function calculateReverseG() {
+            const price = parseFloat(document.getElementById('rev2-price').value) || 1;
+            const cf = parseFloat(document.getElementById('rev2-cf').value) || 0;
+            const r = parseFloat(document.getElementById('rev2-r').value) / 100 || 0;
+            
+            const impliedG = r - (cf / price);
+            
+            document.getElementById('rev-g-result').textContent = formatPercent(impliedG * 100);
+        }
+        
+        // Initialize
+        calculateBasic();
+        calculateGrowing();
+        calculateReverse();
+        calculateReverseG();
+    </script>
+</body>
+</html>

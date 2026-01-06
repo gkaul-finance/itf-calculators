@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: NPV & IRR Calculator | Introduction to Finance</title>
+    <style>
+        :root {
+            --primary: #00274C;
+            --secondary: #FFCB05;
+            --accent: #2196F3;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px 12px 0 0;
+            text-align: center;
+        }
+        
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        
+        .chapter-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .calculator-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calculator-section h3 { color: var(--primary); margin-bottom: 1rem; }
+        
+        .input-group { margin-bottom: 1rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .input-group input:focus { outline: none; border-color: var(--accent); }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .cf-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .cf-input {
+            text-align: center;
+        }
+        
+        .cf-input label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .cf-input input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .result-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .result-card.positive {
+            background: linear-gradient(135deg, var(--success) 0%, #2e7d32 100%);
+            color: white;
+        }
+        
+        .result-card.negative {
+            background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+            color: white;
+        }
+        
+        .result-card.neutral {
+            background: linear-gradient(135deg, var(--primary) 0%, #003366 100%);
+            color: white;
+        }
+        
+        .result-card-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem; }
+        .result-card-value { font-size: 1.8rem; font-weight: 700; }
+        .result-card-sub { font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8; }
+        
+        .decision-box {
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .decision-box.accept {
+            background: #e8f5e9;
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+        
+        .decision-box.reject {
+            background: #ffebee;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+        
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .breakdown-table th, .breakdown-table td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .breakdown-table th {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+        
+        .breakdown-table td:first-child { text-align: center; }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 5px;
+        }
+        
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #ddd; color: #333; }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        footer a { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chapter-badge">Chapter 3</div>
+            <h1>NPV & IRR Calculator</h1>
+            <p>Net Present Value, Internal Rate of Return & Payback Period</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="calculator-section">
+                <h3>Project Cash Flows</h3>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Initial Investment ($)</label>
+                        <input type="number" id="investment" value="10000" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Discount Rate (%)</label>
+                        <input type="number" id="discount-rate" value="10" step="0.1" oninput="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label>Number of Periods</label>
+                        <input type="number" id="num-periods" value="5" min="1" max="20" oninput="updateCashFlowInputs()">
+                    </div>
+                </div>
+                
+                <p style="margin-top: 1rem;"><strong>Enter Cash Flows by Period:</strong></p>
+                <div class="cf-inputs" id="cf-inputs">
+                    <!-- Generated dynamically -->
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-secondary" onclick="setEqualCFs()">Set Equal CFs</button>
+                    <button class="btn btn-secondary" onclick="clearCFs()">Clear All</button>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="results-grid">
+                <div class="result-card positive" id="npv-card">
+                    <div class="result-card-label">Net Present Value</div>
+                    <div class="result-card-value" id="npv-result">$5,230.24</div>
+                    <div class="result-card-sub">Value created</div>
+                </div>
+                <div class="result-card neutral" id="irr-card">
+                    <div class="result-card-label">Internal Rate of Return</div>
+                    <div class="result-card-value" id="irr-result">25.41%</div>
+                    <div class="result-card-sub">Project return</div>
+                </div>
+                <div class="result-card neutral" id="payback-card">
+                    <div class="result-card-label">Payback Period</div>
+                    <div class="result-card-value" id="payback-result">2.5 years</div>
+                    <div class="result-card-sub">Simple payback</div>
+                </div>
+                <div class="result-card neutral" id="pi-card">
+                    <div class="result-card-label">Profitability Index</div>
+                    <div class="result-card-value" id="pi-result">1.52</div>
+                    <div class="result-card-sub">Bang for buck</div>
+                </div>
+            </div>
+            
+            <div class="decision-box accept" id="decision-box">
+                ✓ ACCEPT PROJECT — NPV is positive and IRR exceeds hurdle rate
+            </div>
+            
+            <!-- Breakdown Table -->
+            <div class="calculator-section">
+                <h3>Cash Flow Breakdown</h3>
+                <table class="breakdown-table" id="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Cash Flow</th>
+                            <th>Discount Factor</th>
+                            <th>Present Value</th>
+                            <th>Cumulative PV</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdown-body">
+                        <!-- Generated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="formula-box">
+                <strong>NPV Formula:</strong><br>
+                <code>NPV = -I₀ + CF₁/(1+r)¹ + CF₂/(1+r)² + ... + CFₙ/(1+r)ⁿ</code><br><br>
+                <strong>IRR:</strong> The rate where NPV = 0
+            </div>
+            
+            <div class="insight-box">
+                <h4>💡 Decision Rules</h4>
+                <p><strong>NPV Rule:</strong> Accept if NPV > 0 (creates value)<br>
+                <strong>IRR Rule:</strong> Accept if IRR > hurdle rate (earns more than required)<br>
+                <strong>Profitability Index:</strong> Accept if PI > 1 (benefits exceed costs)<br><br>
+                <em>When in doubt, trust NPV — it directly measures value creation!</em></p>
+            </div>
+        </div>
+        
+        <footer>
+            <p><strong>Introduction to Finance</strong> | Professor Gautam Kaul | University of Michigan Ross School of Business</p>
+            <p><a href="index.html">← Back to All Calculators</a></p>
+        </footer>
+    </div>
+    
+    <script>
+        function formatCurrency(value) {
+            const sign = value < 0 ? '-' : '';
+            return sign + '$' + Math.abs(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+        
+        function updateCashFlowInputs() {
+            const n = parseInt(document.getElementById('num-periods').value) || 5;
+            const container = document.getElementById('cf-inputs');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= n; i++) {
+                const div = document.createElement('div');
+                div.className = 'cf-input';
+                div.innerHTML = `
+                    <label>Year ${i}</label>
+                    <input type="number" id="cf-${i}" value="${i <= 5 ? 4000 : 0}" oninput="calculate()">
+                `;
+                container.appendChild(div);
+            }
+            calculate();
+        }
+        
+        function getCashFlows() {
+            const n = parseInt(document.getElementById('num-periods').value) || 5;
+            const cfs = [];
+            for (let i = 1; i <= n; i++) {
+                const input = document.getElementById(`cf-${i}`);
+                cfs.push(parseFloat(input?.value) || 0);
+            }
+            return cfs;
+        }
+        
+        function setEqualCFs() {
+            const n = parseInt(document.getElementById('num-periods').value) || 5;
+            const investment = parseFloat(document.getElementById('investment').value) || 10000;
+            const equalCF = Math.round(investment / n * 1.5);
+            
+            for (let i = 1; i <= n; i++) {
+                const input = document.getElementById(`cf-${i}`);
+                if (input) input.value = equalCF;
+            }
+            calculate();
+        }
+        
+        function clearCFs() {
+            const n = parseInt(document.getElementById('num-periods').value) || 5;
+            for (let i = 1; i <= n; i++) {
+                const input = document.getElementById(`cf-${i}`);
+                if (input) input.value = 0;
+            }
+            calculate();
+        }
+        
+        function calculateNPV(investment, cashFlows, rate) {
+            let npv = -investment;
+            for (let i = 0; i < cashFlows.length; i++) {
+                npv += cashFlows[i] / Math.pow(1 + rate, i + 1);
+            }
+            return npv;
+        }
+        
+        function calculateIRR(investment, cashFlows) {
+            // Newton-Raphson method
+            let irr = 0.1;
+            const maxIterations = 100;
+            const tolerance = 0.0001;
+            
+            for (let i = 0; i < maxIterations; i++) {
+                const npv = calculateNPV(investment, cashFlows, irr);
+                
+                // Calculate derivative
+                let derivative = 0;
+                for (let j = 0; j < cashFlows.length; j++) {
+                    derivative -= (j + 1) * cashFlows[j] / Math.pow(1 + irr, j + 2);
+                }
+                
+                if (Math.abs(derivative) < 0.0001) break;
+                
+                const newIrr = irr - npv / derivative;
+                
+                if (Math.abs(newIrr - irr) < tolerance) {
+                    return newIrr;
+                }
+                
+                irr = newIrr;
+                
+                // Bounds check
+                if (irr < -0.99) irr = -0.99;
+                if (irr > 10) irr = 10;
+            }
+            
+            return irr;
+        }
+        
+        function calculatePayback(investment, cashFlows) {
+            let cumulative = 0;
+            for (let i = 0; i < cashFlows.length; i++) {
+                cumulative += cashFlows[i];
+                if (cumulative >= investment) {
+                    const remaining = investment - (cumulative - cashFlows[i]);
+                    const fraction = remaining / cashFlows[i];
+                    return i + fraction;
+                }
+            }
+            return Infinity;
+        }
+        
+        function calculate() {
+            const investment = parseFloat(document.getElementById('investment').value) || 0;
+            const rate = parseFloat(document.getElementById('discount-rate').value) / 100 || 0.1;
+            const cashFlows = getCashFlows();
+            
+            // NPV
+            const npv = calculateNPV(investment, cashFlows, rate);
+            document.getElementById('npv-result').textContent = formatCurrency(npv);
+            
+            const npvCard = document.getElementById('npv-card');
+            npvCard.className = 'result-card ' + (npv >= 0 ? 'positive' : 'negative');
+            
+            // IRR
+            const irr = calculateIRR(investment, cashFlows);
+            document.getElementById('irr-result').textContent = isFinite(irr) ? formatPercent(irr * 100) : 'N/A';
+            
+            const irrCard = document.getElementById('irr-card');
+            irrCard.className = 'result-card ' + (irr > rate ? 'positive' : 'negative');
+            
+            // Payback
+            const payback = calculatePayback(investment, cashFlows);
+            document.getElementById('payback-result').textContent = isFinite(payback) ? payback.toFixed(2) + ' years' : 'Never';
+            
+            // PI
+            const pvBenefits = cashFlows.reduce((sum, cf, i) => sum + cf / Math.pow(1 + rate, i + 1), 0);
+            const pi = pvBenefits / investment;
+            document.getElementById('pi-result').textContent = pi.toFixed(2);
+            
+            const piCard = document.getElementById('pi-card');
+            piCard.className = 'result-card ' + (pi > 1 ? 'positive' : 'negative');
+            
+            // Decision
+            const decisionBox = document.getElementById('decision-box');
+            if (npv > 0) {
+                decisionBox.className = 'decision-box accept';
+                decisionBox.innerHTML = '✓ ACCEPT PROJECT — NPV is positive, creating ' + formatCurrency(npv) + ' in value';
+            } else {
+                decisionBox.className = 'decision-box reject';
+                decisionBox.innerHTML = '✗ REJECT PROJECT — NPV is negative, destroying ' + formatCurrency(Math.abs(npv)) + ' in value';
+            }
+            
+            // Breakdown table
+            updateBreakdownTable(investment, cashFlows, rate);
+        }
+        
+        function updateBreakdownTable(investment, cashFlows, rate) {
+            const tbody = document.getElementById('breakdown-body');
+            tbody.innerHTML = '';
+            
+            // Year 0
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td>0</td>
+                <td>${formatCurrency(-investment)}</td>
+                <td>1.0000</td>
+                <td>${formatCurrency(-investment)}</td>
+                <td>${formatCurrency(-investment)}</td>
+            `;
+            tbody.appendChild(row);
+            
+            let cumulativePV = -investment;
+            
+            for (let i = 0; i < cashFlows.length; i++) {
+                const discountFactor = 1 / Math.pow(1 + rate, i + 1);
+                const pv = cashFlows[i] * discountFactor;
+                cumulativePV += pv;
+                
+                row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${formatCurrency(cashFlows[i])}</td>
+                    <td>${discountFactor.toFixed(4)}</td>
+                    <td>${formatCurrency(pv)}</td>
+                    <td style="font-weight: ${i === cashFlows.length - 1 ? 'bold' : 'normal'}">${formatCurrency(cumulativePV)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Initialize
+        updateCashFlowInputs();
+    </script>
+</body>
+</html>
