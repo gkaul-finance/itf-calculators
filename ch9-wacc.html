@@ -25,6 +25,7 @@
         .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
         .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
         .input-group input:focus { outline: none; border-color: var(--accent); }
+        .input-group input[readonly] { background: #e9ecef; }
         .input-group small { color: #666; font-size: 0.85rem; }
         .input-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
         .result-box { background: linear-gradient(135deg, var(--primary) 0%, #003366 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center; margin: 1.5rem 0; }
@@ -37,10 +38,21 @@
         .formula-box { background: #e3f2fd; border-left: 4px solid var(--accent); padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
         .insight-box { background: #fff3e0; border-left: 4px solid var(--warning); padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
         .insight-box h4 { color: var(--warning); margin-bottom: 0.5rem; }
+        .principle-box { background: #e8f5e9; border-left: 4px solid var(--success); padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .principle-box h4 { color: var(--success); margin-bottom: 0.5rem; }
+        .caveat-box { background: #fce4ec; border-left: 4px solid #e91e63; padding: 1rem 1.5rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .caveat-box h4 { color: #c2185b; margin-bottom: 0.5rem; }
         .waterfall { background: var(--light); padding: 1.5rem; border-radius: 8px; margin: 1rem 0; }
         .waterfall-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #ddd; }
         .waterfall-row:last-child { border-bottom: none; }
         .waterfall-row.total { font-weight: bold; background: var(--primary); color: white; margin: 0.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; border-radius: 0 0 8px 8px; }
+        .leverage-demo { background: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; }
+        .leverage-demo h4 { color: var(--primary); margin-bottom: 1rem; }
+        .demo-table { width: 100%; border-collapse: collapse; }
+        .demo-table th, .demo-table td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+        .demo-table th { background: var(--primary); color: white; }
+        .demo-table tr:nth-child(even) { background: #f9f9f9; }
+        .highlight-same { background: #c8e6c9 !important; font-weight: bold; }
         footer { text-align: center; padding: 2rem; color: #666; }
         footer a { color: var(--primary); }
     </style>
@@ -50,132 +62,180 @@
         <header>
             <div class="chapter-badge">Chapter 9</div>
             <h1>WACC & Firm Valuation</h1>
-            <p>Weighted Average Cost of Capital & Enterprise Value</p>
+            <p>Return on Assets, Capital Structure & Enterprise Value</p>
         </header>
         
         <div class="main-content">
+            <div class="principle-box">
+                <h4>🎯 Core Principle: Financing is Value-Neutral</h4>
+                <p><strong>WACC = Return on Unlevered Equity = Return on Assets</strong></p>
+                <p>The real assets of a firm determine its required return. How you finance those assets (debt vs. equity) does not change what the assets must earn. You cannot create value by slicing the pie differently.</p>
+            </div>
+            
             <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('wacc')">WACC Calculator</button>
+                <button class="tab-btn active" onclick="showTab('wacc')">WACC = R<sub>A</sub></button>
+                <button class="tab-btn" onclick="showTab('invariance')">Leverage Invariance</button>
                 <button class="tab-btn" onclick="showTab('valuation')">Firm Valuation</button>
                 <button class="tab-btn" onclick="showTab('equity')">Equity Value</button>
             </div>
             
-            <!-- WACC Calculator -->
+            <!-- WACC = Return on Assets -->
             <div id="wacc" class="tab-content active">
                 <div class="calculator-section">
-                    <h3>Cost of Equity (using CAPM)</h3>
+                    <h3>Return on Assets (WACC)</h3>
+                    <p>The required return is determined by the <strong>assets</strong>, not by how they're financed.</p>
+                    
                     <div class="input-row">
                         <div class="input-group">
-                            <label>Risk-Free Rate (%)</label>
-                            <input type="number" id="wacc-rf" value="4" step="0.1" oninput="calculateWACC()">
+                            <label>Return on Assets / WACC (%)</label>
+                            <input type="number" id="wacc-ra" value="10" step="0.1" oninput="calculateWACC()">
+                            <small>Determined by asset risk (business risk)</small>
                         </div>
                         <div class="input-group">
-                            <label>Market Risk Premium (%)</label>
-                            <input type="number" id="wacc-mrp" value="6" step="0.1" oninput="calculateWACC()">
-                        </div>
-                        <div class="input-group">
-                            <label>Equity Beta</label>
-                            <input type="number" id="wacc-beta" value="1.2" step="0.1" oninput="calculateWACC()">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="calculator-section">
-                    <h3>Cost of Debt & Capital Structure</h3>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label>Cost of Debt (%)</label>
-                            <input type="number" id="wacc-rd" value="6" step="0.1" oninput="calculateWACC()">
-                            <small>Pre-tax borrowing rate</small>
-                        </div>
-                        <div class="input-group">
-                            <label>Tax Rate (%)</label>
-                            <input type="number" id="wacc-tax" value="25" step="1" oninput="calculateWACC()">
+                            <label>Cost of Debt R<sub>d</sub> (%)</label>
+                            <input type="number" id="wacc-rd" value="5" step="0.1" oninput="calculateWACC()">
+                            <small>Rate paid to lenders</small>
                         </div>
                     </div>
                     <div class="input-row">
                         <div class="input-group">
                             <label>Market Value of Equity ($M)</label>
-                            <input type="number" id="wacc-mve" value="800" oninput="calculateWACC()">
+                            <input type="number" id="wacc-mve" value="600" oninput="calculateWACC()">
                         </div>
                         <div class="input-group">
                             <label>Market Value of Debt ($M)</label>
-                            <input type="number" id="wacc-mvd" value="200" oninput="calculateWACC()">
+                            <input type="number" id="wacc-mvd" value="400" oninput="calculateWACC()">
                         </div>
                     </div>
                 </div>
                 
                 <div class="result-box">
-                    <div class="result-label">Weighted Average Cost of Capital</div>
-                    <div class="result-value" id="wacc-result">9.98%</div>
+                    <div class="result-label">Required Return on Equity (R<sub>E</sub>)</div>
+                    <div class="result-value" id="wacc-re-result">13.33%</div>
                     <div class="result-grid">
                         <div class="result-item">
-                            <div class="result-item-label">Cost of Equity</div>
-                            <div class="result-item-value" id="wacc-re">11.20%</div>
+                            <div class="result-item-label">Return on Assets</div>
+                            <div class="result-item-value" id="wacc-ra-display">10.00%</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-item-label">After-Tax Cost of Debt</div>
-                            <div class="result-item-value" id="wacc-rd-at">4.50%</div>
+                            <div class="result-item-label">Cost of Debt</div>
+                            <div class="result-item-value" id="wacc-rd-display">5.00%</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-item-label">Equity Weight</div>
-                            <div class="result-item-value" id="wacc-we">80%</div>
+                            <div class="result-item-label">D/E Ratio</div>
+                            <div class="result-item-value" id="wacc-de">0.67</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-item-label">Debt Weight</div>
-                            <div class="result-item-value" id="wacc-wd">20%</div>
+                            <div class="result-item-label">WACC Check</div>
+                            <div class="result-item-value" id="wacc-check">10.00%</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="waterfall">
-                    <h4 style="color: var(--primary); margin-bottom: 1rem;">WACC Breakdown</h4>
+                    <h4 style="color: var(--primary); margin-bottom: 1rem;">WACC Composition (always equals R<sub>A</sub>)</h4>
                     <div class="waterfall-row">
-                        <span>Equity Component: We × Re</span>
-                        <span id="wacc-eq-comp">80% × 11.20% = 8.96%</span>
+                        <span>Equity Component: W<sub>E</sub> × R<sub>E</sub></span>
+                        <span id="wacc-eq-comp">60% × 13.33% = 8.00%</span>
                     </div>
                     <div class="waterfall-row">
-                        <span>Debt Component: Wd × Rd × (1-T)</span>
-                        <span id="wacc-debt-comp">20% × 6% × (1-25%) = 0.90%</span>
+                        <span>Debt Component: W<sub>D</sub> × R<sub>D</sub></span>
+                        <span id="wacc-debt-comp">40% × 5.00% = 2.00%</span>
                     </div>
                     <div class="waterfall-row total">
-                        <span>WACC</span>
-                        <span id="wacc-total">9.86%</span>
+                        <span>WACC = Return on Assets</span>
+                        <span id="wacc-total">10.00%</span>
                     </div>
                 </div>
                 
                 <div class="formula-box">
-                    <strong>WACC Formula:</strong><br>
-                    <code>WACC = (E/V) × Re + (D/V) × Rd × (1-T)</code><br><br>
-                    <small>Where E = equity value, D = debt value, V = E + D, Re = cost of equity, Rd = cost of debt, T = tax rate</small>
+                    <strong>Key Relationships:</strong><br><br>
+                    <code>WACC = R<sub>A</sub> = (E/V) × R<sub>E</sub> + (D/V) × R<sub>D</sub></code><br><br>
+                    <code>R<sub>E</sub> = R<sub>A</sub> + (D/E) × (R<sub>A</sub> - R<sub>D</sub>)</code><br><br>
+                    <small>Equity holders bear more risk with leverage, so R<sub>E</sub> increases. But this exactly offsets the "cheaper" debt, leaving WACC unchanged.</small>
                 </div>
                 
                 <div class="insight-box">
-                    <h4>💡 Key Insight</h4>
-                    <p id="wacc-insight">The tax shield on debt reduces WACC! Debt costs 6%, but after-tax it's only 4.5%. This makes debt "cheaper" than equity — but too much debt increases bankruptcy risk.</p>
+                    <h4>💡 Why Does R<sub>E</sub> Increase with Leverage?</h4>
+                    <p id="wacc-insight">With a D/E ratio of 0.67, equity holders take on more risk. They require 13.33% — higher than the 10% asset return. But when you weight it all together: 60% × 13.33% + 40% × 5% = 10%. <strong>WACC always equals R<sub>A</sub>!</strong></p>
+                </div>
+            </div>
+            
+            <!-- Leverage Invariance Demo -->
+            <div id="invariance" class="tab-content">
+                <div class="calculator-section">
+                    <h3>Leverage Doesn't Change WACC</h3>
+                    <p>Watch what happens as we change the capital structure — WACC stays the same!</p>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Return on Assets R<sub>A</sub> (%)</label>
+                            <input type="number" id="demo-ra" value="10" step="0.5" oninput="calculateDemo()">
+                            <small>This is fixed by the assets</small>
+                        </div>
+                        <div class="input-group">
+                            <label>Cost of Debt R<sub>D</sub> (%)</label>
+                            <input type="number" id="demo-rd" value="5" step="0.5" oninput="calculateDemo()">
+                        </div>
+                        <div class="input-group">
+                            <label>Total Firm Value ($M)</label>
+                            <input type="number" id="demo-v" value="1000" oninput="calculateDemo()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leverage-demo">
+                    <h4>Capital Structure Scenarios</h4>
+                    <table class="demo-table" id="demo-table">
+                        <thead>
+                            <tr>
+                                <th>D/E Ratio</th>
+                                <th>Debt ($M)</th>
+                                <th>Equity ($M)</th>
+                                <th>R<sub>E</sub></th>
+                                <th>R<sub>D</sub></th>
+                                <th>WACC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">WACC Across All Capital Structures</div>
+                    <div class="result-value" id="demo-wacc">10.00%</div>
+                    <p style="margin-top: 1rem; opacity: 0.9;">Always equals Return on Assets — financing is irrelevant!</p>
+                </div>
+                
+                <div class="principle-box">
+                    <h4>🎯 The M-M Insight</h4>
+                    <p><strong>The pie doesn't get bigger by slicing it differently.</strong></p>
+                    <p>Whether you have 0% debt or 80% debt, the total value of the firm is the same. More debt makes equity riskier (higher R<sub>E</sub>), but this exactly offsets the lower cost of debt. Value comes from assets, not financing.</p>
                 </div>
             </div>
             
             <!-- Firm Valuation -->
             <div id="valuation" class="tab-content">
                 <div class="calculator-section">
-                    <h3>DCF Firm Valuation (Growing Perpetuity)</h3>
-                    <p>Value the entire firm using free cash flows</p>
+                    <h3>DCF Firm Valuation</h3>
+                    <p>Value the firm using Free Cash Flow to Firm, discounted at WACC (= R<sub>A</sub>)</p>
                     
                     <div class="input-row">
                         <div class="input-group">
                             <label>Next Year's FCF ($M)</label>
                             <input type="number" id="val-fcf" value="50" oninput="calculateValuation()">
-                            <small>Free cash flow to firm (FCFF)</small>
+                            <small>Free Cash Flow to Firm</small>
                         </div>
                         <div class="input-group">
-                            <label>WACC (%)</label>
+                            <label>WACC / R<sub>A</sub> (%)</label>
                             <input type="number" id="val-wacc" value="10" step="0.1" oninput="calculateValuation()">
                         </div>
                         <div class="input-group">
                             <label>Growth Rate (%)</label>
                             <input type="number" id="val-g" value="3" step="0.5" oninput="calculateValuation()">
-                            <small>Long-term sustainable growth</small>
+                            <small>Sustainable long-term growth</small>
                         </div>
                     </div>
                 </div>
@@ -185,7 +245,7 @@
                     <div class="result-value" id="val-ev">$714.29M</div>
                     <div class="result-grid">
                         <div class="result-item">
-                            <div class="result-item-label">FCF / EV Ratio</div>
+                            <div class="result-item-label">FCF Yield</div>
                             <div class="result-item-value" id="val-ratio">7.00%</div>
                         </div>
                         <div class="result-item">
@@ -197,13 +257,13 @@
                 
                 <div class="formula-box">
                     <strong>Enterprise Value (Growing Perpetuity):</strong><br>
-                    <code>EV = FCF₁ / (WACC - g)</code><br><br>
-                    <small>This is the Gordon Growth model applied to firm value!</small>
+                    <code>EV = FCF<sub>1</sub> / (WACC - g) = FCF<sub>1</sub> / (R<sub>A</sub> - g)</code><br><br>
+                    <small>This is the Gordon Growth model applied to the whole firm. Note: EV doesn't change with capital structure because WACC = R<sub>A</sub> is constant!</small>
                 </div>
                 
                 <div class="insight-box">
-                    <h4>💡 The Spread Matters</h4>
-                    <p id="val-insight">Enterprise value depends on the spread between WACC and growth. With 10% WACC and 3% growth, the spread is 7%. A smaller spread = higher valuation (but also more risk if growth disappoints).</p>
+                    <h4>💡 Value Comes From Assets</h4>
+                    <p id="val-insight">Enterprise value of $714M depends only on the cash flows from the assets and the risk of those assets (R<sub>A</sub> = 10%). How you finance doesn't change EV!</p>
                 </div>
             </div>
             
@@ -211,7 +271,7 @@
             <div id="equity" class="tab-content">
                 <div class="calculator-section">
                     <h3>From Enterprise Value to Equity Value</h3>
-                    <p>Calculate what shareholders actually own</p>
+                    <p>EV is constant, but equity value changes with capital structure</p>
                     
                     <div class="input-row">
                         <div class="input-group">
@@ -271,15 +331,18 @@
                 </div>
                 
                 <div class="formula-box">
-                    <strong>Key Relationships:</strong><br>
-                    <code>Equity Value = EV - Debt + Cash</code><br>
-                    <code>Price per Share = Equity Value / Shares Outstanding</code>
+                    <strong>Key Relationship:</strong><br>
+                    <code>Equity Value = EV - Debt + Cash</code><br><br>
+                    <small>EV stays constant (determined by assets). More debt → Less equity value, but remaining equity is riskier and has higher required return.</small>
                 </div>
-                
-                <div class="insight-box">
-                    <h4>💡 EV vs. Equity Value</h4>
-                    <p>Enterprise Value is what the whole business is worth. Equity Value is what's left for shareholders after paying off debt. Cash is added back because new owners get it!</p>
-                </div>
+            </div>
+            
+            <!-- Real World Caveat -->
+            <div class="caveat-box">
+                <h4>⚠️ A Note on Real-World Tax Treatment</h4>
+                <p>In the real world, interest payments on debt are tax-deductible. One common way to account for this is to use <strong>R<sub>D</sub> × (1 - T)</strong> in the WACC formula instead of R<sub>D</sub>.</p>
+                <p style="margin-top: 0.5rem;">However, this adjustment is more complicated than it appears. It raises difficult questions: What is the correct discount rate for the tax shield? How do you unlever and relever betas consistently? These issues are beyond the scope of this course.</p>
+                <p style="margin-top: 0.5rem;"><strong>For this course:</strong> We allow for taxes on corporate income, but not for the deductibility of interest from taxes. This keeps our framework clean and emphasizes the core insight: <em>real assets determine value, financing is just rearranging claims.</em></p>
             </div>
         </div>
         
@@ -301,38 +364,78 @@
         function formatMoney(value) { return '$' + value.toFixed(2) + 'M'; }
         
         function calculateWACC() {
-            const rf = parseFloat(document.getElementById('wacc-rf').value) || 0;
-            const mrp = parseFloat(document.getElementById('wacc-mrp').value) || 0;
-            const beta = parseFloat(document.getElementById('wacc-beta').value) || 0;
-            const rd = parseFloat(document.getElementById('wacc-rd').value) || 0;
-            const tax = parseFloat(document.getElementById('wacc-tax').value) / 100 || 0;
-            const mve = parseFloat(document.getElementById('wacc-mve').value) || 0;
-            const mvd = parseFloat(document.getElementById('wacc-mvd').value) || 0;
+            const ra = parseFloat(document.getElementById('wacc-ra').value) / 100 || 0.10;
+            const rd = parseFloat(document.getElementById('wacc-rd').value) / 100 || 0.05;
+            const mve = parseFloat(document.getElementById('wacc-mve').value) || 600;
+            const mvd = parseFloat(document.getElementById('wacc-mvd').value) || 400;
             
-            const re = rf + beta * mrp;
-            const rdAfterTax = rd * (1 - tax);
             const totalValue = mve + mvd;
             const we = mve / totalValue;
             const wd = mvd / totalValue;
-            const wacc = we * re + wd * rdAfterTax;
+            const de = mvd / mve;
             
-            document.getElementById('wacc-result').textContent = formatPercent(wacc);
-            document.getElementById('wacc-re').textContent = formatPercent(re);
-            document.getElementById('wacc-rd-at').textContent = formatPercent(rdAfterTax);
-            document.getElementById('wacc-we').textContent = (we * 100).toFixed(0) + '%';
-            document.getElementById('wacc-wd').textContent = (wd * 100).toFixed(0) + '%';
+            // RE = RA + (D/E) × (RA - RD)
+            const re = ra + de * (ra - rd);
             
-            document.getElementById('wacc-eq-comp').textContent = `${(we*100).toFixed(0)}% × ${formatPercent(re)} = ${formatPercent(we * re)}`;
-            document.getElementById('wacc-debt-comp').textContent = `${(wd*100).toFixed(0)}% × ${rd}% × (1-${(tax*100).toFixed(0)}%) = ${formatPercent(wd * rdAfterTax)}`;
-            document.getElementById('wacc-total').textContent = formatPercent(wacc);
+            // WACC should equal RA
+            const wacc = we * re + wd * rd;
+            
+            document.getElementById('wacc-re-result').textContent = formatPercent(re * 100);
+            document.getElementById('wacc-ra-display').textContent = formatPercent(ra * 100);
+            document.getElementById('wacc-rd-display').textContent = formatPercent(rd * 100);
+            document.getElementById('wacc-de').textContent = de.toFixed(2);
+            document.getElementById('wacc-check').textContent = formatPercent(wacc * 100);
+            
+            document.getElementById('wacc-eq-comp').textContent = `${(we*100).toFixed(0)}% × ${formatPercent(re*100)} = ${formatPercent(we * re * 100)}`;
+            document.getElementById('wacc-debt-comp').textContent = `${(wd*100).toFixed(0)}% × ${formatPercent(rd*100)} = ${formatPercent(wd * rd * 100)}`;
+            document.getElementById('wacc-total').textContent = formatPercent(wacc * 100);
             
             document.getElementById('wacc-insight').textContent = 
-                `The tax shield on debt reduces WACC! Debt costs ${rd}%, but after-tax it's only ${formatPercent(rdAfterTax)}. This makes debt "cheaper" than equity (${formatPercent(re)}) — but too much debt increases bankruptcy risk.`;
+                `With a D/E ratio of ${de.toFixed(2)}, equity holders take on more risk. They require ${formatPercent(re*100)} — higher than the ${formatPercent(ra*100)} asset return. But when you weight it all together: ${(we*100).toFixed(0)}% × ${formatPercent(re*100)} + ${(wd*100).toFixed(0)}% × ${formatPercent(rd*100)} = ${formatPercent(wacc*100)}. WACC always equals RA!`;
+        }
+        
+        function calculateDemo() {
+            const ra = parseFloat(document.getElementById('demo-ra').value) / 100 || 0.10;
+            const rd = parseFloat(document.getElementById('demo-rd').value) / 100 || 0.05;
+            const v = parseFloat(document.getElementById('demo-v').value) || 1000;
+            
+            const scenarios = [
+                { de: 0, label: '0%' },
+                { de: 0.25, label: '25%' },
+                { de: 0.5, label: '50%' },
+                { de: 1.0, label: '100%' },
+                { de: 2.0, label: '200%' }
+            ];
+            
+            const tbody = document.querySelector('#demo-table tbody');
+            tbody.innerHTML = '';
+            
+            scenarios.forEach(s => {
+                const d = v * s.de / (1 + s.de);
+                const e = v - d;
+                const re = ra + s.de * (ra - rd);
+                const we = e / v;
+                const wd = d / v;
+                const wacc = we * re + wd * rd;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${s.label}</td>
+                    <td>$${d.toFixed(0)}</td>
+                    <td>$${e.toFixed(0)}</td>
+                    <td>${formatPercent(re * 100)}</td>
+                    <td>${formatPercent(rd * 100)}</td>
+                    <td class="highlight-same">${formatPercent(wacc * 100)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('demo-wacc').textContent = formatPercent(ra * 100);
         }
         
         function calculateValuation() {
             const fcf = parseFloat(document.getElementById('val-fcf').value) || 0;
-            const wacc = parseFloat(document.getElementById('val-wacc').value) / 100 || 0.01;
+            const wacc = parseFloat(document.getElementById('val-wacc').value) / 100 || 0.10;
             const g = parseFloat(document.getElementById('val-g').value) / 100 || 0;
             
             if (wacc <= g) {
@@ -348,9 +451,8 @@
             document.getElementById('val-ratio').textContent = formatPercent(ratio);
             document.getElementById('val-multiple').textContent = multiple.toFixed(1) + 'x';
             
-            const spread = (wacc - g) * 100;
             document.getElementById('val-insight').textContent = 
-                `Enterprise value depends on the spread between WACC and growth. With ${formatPercent(wacc*100)} WACC and ${formatPercent(g*100)} growth, the spread is ${formatPercent(spread)}. A smaller spread = higher valuation (but also more risk if growth disappoints).`;
+                `Enterprise value of ${formatMoney(ev)} depends only on the cash flows from the assets and the risk of those assets (RA = ${formatPercent(wacc*100)}). How you finance doesn't change EV!`;
         }
         
         function calculateEquity() {
@@ -375,6 +477,7 @@
         
         // Initialize
         calculateWACC();
+        calculateDemo();
         calculateValuation();
         calculateEquity();
     </script>
